@@ -1,0 +1,85 @@
+玲瓏學院｜九大服飾款式圖片生成詞
+
+說明
+依據世界書【通用服裝改造與異能流派美學規範】的「九大核心服飾款式風格載體」，每個款式一組圖片生成詞，共 9 組。
+1. 採「純粹經典模式」：單一款式、二次元化修改款，不混搭。
+2. 每組詞已套用該規範的共同要求：二次元化剪裁、絕對領域（過膝襪與裙擺之間保留一截裸露大腿）、露肩或露背或高腰露臍等剪裁、異材質質感、半透明漸變或幾何鏤空、多層次蕾絲飄帶隨粒子流飛舞、禁止安全褲、禁止外露內衣褲。
+3. 詞用英文標籤，因為多數繪圖模型（Stable Diffusion、NovelAI 等）用英文標籤效果最好；每組前面附繁體中文說明，方便你對照與修改。
+4. 人物一律是成年女性（adult woman）。內容為穿著服飾、局部肌膚顯露與曲線暗示，不含裸露。
+5. 使用方式：把「共用前綴」放在每組詞最前面，再接該款式的詞；負面詞每組都用同一份。
+6. 這些詞沒有實際生成圖片測試過，各模型對標籤的反應不同，需要你自己微調權重。
+
+共用前綴
+masterpiece, best quality, anime illustration, highly detailed, 1girl, solo, adult woman, mature figure, long hair reaching waist, glowing particles of light drifting in the air, floating sky island academy in background, volumetric lighting, dynamic pose, full body, absolute territory, thighhighs with bare thigh gap, no shorts underneath
+
+共用負面詞
+nsfw, nudity, nipples, exposed genitals, underwear visible, panties, bloomers, safety shorts, shorts under skirt, child, loli, young girl, lowres, bad anatomy, bad hands, extra fingers, deformed, text, watermark, signature, cropped
+
+============================================================
+一、學校標準制服改良款（水手服／西裝外套）　面相：元氣、英氣
+============================================================
+說明：水手服與西裝外套混合的改良制服，短版露出平坦側腰與肚臍，外套滑落露肩，百褶短裙與過膝襪之間保留絕對領域。
+詞：
+sailor uniform modified, short cropped sailor top, bare midriff, navel visible, blazer slipping off shoulders, off-shoulder, navy and white and red palette, loose ribbon tie, pleated mini skirt, knee-high socks, zettai ryouiki, lace trim, school emblem, confident smile, wind blowing hair and skirt, glossy fabric texture contrast, academy corridor
+
+============================================================
+二、改良式聖職信仰款（修女服／神官袍／巫女服／道袍）　面相：聖潔、高冷
+============================================================
+說明：以修女服為主體的改良款：黑白配色、深 V 與一字領、側身鏤空、高衩長裙，搭配十字架吊墜與頭紗。想改成其他聖職，把括號內的詞換掉即可。
+詞：
+modified nun outfit, black and white habit dress, plunging neckline, side cutout, bare shoulders, high slit long skirt, sheer veil, cross pendant, lace ribbons streaming behind, black thighhighs, zettai ryouiki, holy light, serene cold expression, sacred cathedral interior
+替換：巫女服 miko outfit, red and white, detached sleeves, shide ornaments；神官袍 priestess robe, white and gold；道袍 taoist robe, indigo and white, floating sleeves
+
+============================================================
+三、緊身皮革與流線橡膠服飾款　面相：性感、傲慢
+============================================================
+說明：貼身包覆曲線的亮面皮革與橡膠質感，只做局部肌膚顯露與胸腹鏤空，配皮帶束帶與長筒靴，霓虹邊緣光。
+詞：
+glossy latex and leather outfit, form-fitting, sleek curves, cropped leather top, bare midriff, geometric cutout, harness straps, short skirt, long gloves, thigh-high boots, zettai ryouiki, glossy highlights, neon rim light, dominant smirk, cyberpunk academy rooftop, reflective material contrast
+
+============================================================
+四、古風仙俠與和風大正羽織款　面相：空靈、知性
+============================================================
+說明：仙俠漢服與大正羽織混合：玄青與月白、單肩或斷袖、長輕紗袖、高衩長裙、流雲藍色，御空飄浮，髮簪與流蘇。
+詞：
+xianxia hanfu and taisho haori, flowing sheer sleeves, one-shoulder, off-shoulder, haori jacket, high slit long skirt, side hip cutout, indigo and moon-white and cloud blue palette, silk and chiffon texture, hairpin with tassels, long ribbons streaming, floating in the air, glowing qi particles, ethereal calm expression, cloud sea at sunrise
+
+============================================================
+五、軍風蘿莉塔華麗服飾款　面相：威嚴、傲慢
+============================================================
+說明：軍裝與蘿莉塔華麗風格結合的成年女性造型：雙排扣短版軍外套、肩章與金色穗帶、荷葉邊短裙、軍帽、吊襪帶，強調威嚴氣勢。
+詞：
+military lolita fashion, adult woman, double-breasted cropped military jacket, epaulettes, gold braid, bare midriff, frilled mini skirt, peaked cap, white gloves, garter straps, thighhighs, zettai ryouiki, commanding presence, proud expression, red and black and gold palette, ornate academy hall, flags in background
+
+============================================================
+六、魔女神秘魔幻服飾款　面相：神秘、高冷
+============================================================
+說明：夜空藍與深紫的魔女造型：尖帽、束腰、露肩、蓬裙與黑絲，手持魔導書，星光與魔法陣在身邊流動。
+詞：
+witch outfit, pointed hat, off-shoulder corset top, plunging neckline, layered puffy skirt, black stockings, zettai ryouiki, midnight blue and deep purple palette, star ornaments, grimoire in hand, magic circle glowing, floating stars, mysterious half-lidded eyes, velvet and sheer tulle texture contrast, moonlit tower
+
+============================================================
+七、輕甲與靈巧防禦服飾款　面相：英氣、威嚴
+============================================================
+說明：輕甲類型：肩甲與胸甲疊在貼身短上衣上，露肩露腹，皮革束帶與短裙，長筒戰靴，英氣颯爽。
+詞：
+light armor outfit, pauldrons, breastplate over fitted cropped top, bare midriff, leather straps, tassets, mini skirt, long boots, zettai ryouiki, fingerless gauntlets, metal and leather and cloth texture contrast, heroic stance, determined expression, silver and dark red palette, battle arena with energy sparks
+
+============================================================
+八、高機能東方典雅旗袍款　面相：高冷、知性
+============================================================
+說明：旗袍結合機能面料：腰部中央使用半透明漸變薄紗，向下漸變為不透明下擺，幾何鏤空花紋、高衩、側臀鏤空，配中國結髮飾與金色滾邊。
+詞：
+high-tech qipao, cheongsam, semi-transparent gradient panel at waist, sheer to opaque fade, geometric lattice cutout, high slit, side hip cutout, mandarin collar, gold trim, chinese knot hair ornament, black and gold and jade green palette, sleek silk and functional fabric texture, elegant cool expression, long legs in sheer stockings, neon lanterns and calm night city
+
+============================================================
+九、專屬侍從蕾絲女僕裝　面相：可愛、元氣
+============================================================
+說明：改良女僕裝：露肩短版蕾絲上衣、多層蕾絲短裙與圍裙、頭飾、吊襪帶與絲襪，身後蕾絲飄帶隨粒子流飛舞。
+詞：
+lace maid outfit, off-shoulder, cropped lace top, bare midriff, layered lace mini skirt, frilled apron, maid headdress, garter straps, white thighhighs, zettai ryouiki, long lace ribbons streaming behind, cheerful cute smile, black and white and pink palette, delicate lace and satin texture contrast, bright academy dormitory room
+
+============================================================
+附註：混搭用法
+============================================================
+若要「跨界混搭」，從兩個款式各取一半：上半身用其中一組的上衣與領口詞，下半身用另一組的裙或褲詞；配色改成共同色系（例如修女 × 魔女統一為黑、深紫、夜空藍），並補一件連接兩個風格的配件詞（例如 black stockings, cross pendant）。
