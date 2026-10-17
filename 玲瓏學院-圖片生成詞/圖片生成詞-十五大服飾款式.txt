@@ -1,0 +1,126 @@
+玲瓏學院｜十五大服飾款式圖片生成詞
+
+說明
+依據世界書【通用服裝改造與異能流派美學規範】的「十五大核心服飾款式風格載體」，每個款式一組圖片生成詞，共 15 組。
+1. 採「純粹經典模式」：單一款式、二次元化修改款，不混搭。
+2. 每組詞已套用該規範的共同要求：二次元化剪裁、絕對領域（過膝襪與裙擺之間保留一截裸露大腿）、露肩或露背或高腰露臍等剪裁、異材質質感、半透明漸變或幾何鏤空、多層次蕾絲飄帶隨粒子流飛舞、禁止安全褲、禁止外露內衣褲。
+3. 詞用英文標籤，因為多數繪圖模型（Stable Diffusion、NovelAI 等）用英文標籤效果最好；每組前面附繁體中文說明與面相，方便你對照與修改。
+4. 人物一律是成年女性（adult woman）。內容為穿著服飾、局部肌膚顯露與曲線暗示，不含裸露。
+5. 使用方式：把「共用前綴」放在每組詞最前面，再接該款式的詞；負面詞每組都用同一份。
+6. 這些詞沒有實際生成圖片測試過，各模型對標籤的反應不同，需要你自己微調權重。
+
+共用前綴
+masterpiece, best quality, anime illustration, highly detailed, 1girl, solo, adult woman, mature figure, long hair reaching waist, glowing particles of light drifting in the air, floating sky island academy in background, volumetric lighting, dynamic pose, full body, absolute territory, thighhighs with bare thigh gap, no shorts underneath
+
+共用負面詞
+nsfw, nudity, nipples, exposed genitals, underwear visible, panties, bloomers, safety shorts, shorts under skirt, child, loli, young girl, lowres, bad anatomy, bad hands, extra fingers, deformed, text, watermark, signature, cropped
+
+============================================================
+一、水手服改良款　面相：元氣、可愛
+============================================================
+說明：短版水手服，露出平坦側腰與肚臍，領口改為一字或露肩，百褶短裙與過膝襪之間保留絕對領域，領巾與蝴蝶結隨風飄動。
+詞：
+sailor uniform modified, short cropped sailor top, bare midriff, navel visible, off-shoulder sailor collar, loose neckerchief, navy and white and red palette, pleated mini skirt, knee-high socks, zettai ryouiki, lace trim, bright cheerful smile, wind blowing hair and skirt, glossy fabric texture contrast, academy rooftop at sunset
+
+============================================================
+二、西裝外套改良款　面相：英氣、知性
+============================================================
+說明：西裝外套短版改造，外套滑落露肩，內搭短版襯衫露腰，領帶鬆開，短裙與長襪間保留絕對領域。
+詞：
+blazer uniform modified, cropped blazer slipping off shoulders, off-shoulder, short cropped shirt, bare midriff, loosened necktie, high-waist pleated mini skirt, garter straps, thighhighs, zettai ryouiki, school emblem, confident calm expression, charcoal and white and wine red palette, wool and silk texture contrast, academy corridor
+
+============================================================
+三、修女服改良款　面相：聖潔、高冷
+============================================================
+說明：黑白修女服改良：深 V 與一字領、側身鏤空、高衩長裙，搭配頭紗、十字架吊墜與蕾絲飄帶。
+詞：
+modified nun outfit, black and white habit dress, plunging neckline, side cutout, bare shoulders, high slit long skirt, sheer veil, cross pendant, lace ribbons streaming behind, black thighhighs, zettai ryouiki, holy light, serene cold expression, sacred cathedral interior
+
+============================================================
+四、神官袍改良款　面相：威嚴、知性
+============================================================
+說明：白金配色的神官袍改良：露肩寬袖、短版長袍前襟、金色刺繡與寶石胸飾，長披肩隨風飄動。
+詞：
+modified priestess robe, white and gold palette, off-shoulder wide sleeves, cropped front robe, bare midriff, high slit skirt, gold embroidery, jeweled chest ornament, long flowing stole, sheer cape, thighhighs, zettai ryouiki, dignified gaze, sacred light beams, marble temple hall
+
+============================================================
+五、巫女服改良款　面相：空靈、元氣
+============================================================
+說明：紅白巫女服改良：分離式寬袖、露肩、短版白衣，紅色短裙或高衩裙，御幣與紙垂，神社與鳥居背景。
+詞：
+modified miko outfit, red and white, detached sleeves, off-shoulder, cropped white haori top, bare midriff, red hakama mini skirt, shide ornaments, ribbon hair tie, white thighhighs, zettai ryouiki, gohei wand, gentle ethereal smile, shrine torii gate, cherry blossom petals, floating spirit particles
+
+============================================================
+六、道袍改良款　面相：空靈、高冷
+============================================================
+說明：玄青與月白的道袍改良：大袖飄飛、露肩、短版衣襟與高衩長下裳，配拂塵與玉佩，流雲光粒。
+詞：
+modified taoist robe, indigo and moon-white palette, floating wide sleeves, off-shoulder, cropped robe front, side hip cutout, high slit long skirt, jade pendant, horsetail whisk, ribbon sash, sheer thighhighs, zettai ryouiki, aloof ethereal expression, floating clouds, glowing qi particles, mountain peak at dawn
+
+============================================================
+七、緊身皮革服飾款　面相：性感、傲慢
+============================================================
+說明：貼身包覆曲線的皮革：短版皮革上衣、局部鏤空、皮帶束帶與長筒靴，只做局部肌膚顯露與曲線暗示。
+詞：
+form-fitting leather outfit, sleek curves, cropped leather top, bare midriff, geometric cutout, harness straps, leather mini skirt, long gloves, thigh-high boots, zettai ryouiki, studded belt, dominant smirk, black and crimson palette, matte leather and metal texture contrast, neon-lit academy rooftop
+
+============================================================
+八、流線橡膠服飾款　面相：高冷、性感
+============================================================
+說明：亮面流線橡膠質感：貼身短版上衣、流線分割線與半透明面板，長手套與長筒靴，霓虹邊緣光與高光反射。
+詞：
+glossy latex outfit, streamlined form-fitting, cropped latex top, bare midriff, translucent panels, sleek seam lines, latex mini skirt, long gloves, thigh-high boots, zettai ryouiki, glossy highlights, reflective surface, neon rim light, cool detached expression, silver and cyan and black palette, futuristic training hall
+
+============================================================
+九、古風仙俠服飾款　面相：空靈、知性
+============================================================
+說明：仙俠漢服：玄青與月白、單肩或斷袖、長輕紗袖、高衩長裙，髮簪與流蘇，御空飄浮，流雲藍色。
+詞：
+xianxia hanfu, flowing sheer sleeves, one-shoulder, off-shoulder, high slit long skirt, side hip cutout, indigo and moon-white and cloud blue palette, silk and chiffon texture, hairpin with tassels, long ribbons streaming, floating in the air, glowing qi particles, ethereal calm expression, cloud sea at sunrise
+
+============================================================
+十、和風大正羽織款　面相：元氣、知性
+============================================================
+說明：大正浪漫風：羽織外套、露肩振袖、短版和服上衣配袴裙或短裙，長襪與木屐，櫻花與燈籠。
+詞：
+taisho roman style, haori jacket, off-shoulder furisode sleeves, cropped kimono top, bare midriff, hakama mini skirt, big hair ribbon, knee-high socks with boots, zettai ryouiki, burgundy and cream and indigo palette, cotton and silk texture contrast, cheerful bright smile, cherry blossoms, paper lanterns, old-fashioned street at dusk
+
+============================================================
+十一、軍風蘿莉塔華麗服飾款　面相：威嚴、傲慢
+============================================================
+說明：軍裝與蘿莉塔華麗風格結合的成年女性造型：雙排扣短版軍外套、肩章與金色穗帶、荷葉邊短裙、軍帽、吊襪帶，強調威嚴氣勢。
+詞：
+military lolita fashion, adult woman, double-breasted cropped military jacket, epaulettes, gold braid, bare midriff, frilled mini skirt, peaked cap, white gloves, garter straps, thighhighs, zettai ryouiki, commanding presence, proud expression, red and black and gold palette, ornate academy hall, flags in background
+
+============================================================
+十二、魔女神秘魔幻服飾款　面相：神秘、高冷
+============================================================
+說明：夜空藍與深紫的魔女造型：尖帽、束腰、露肩、蓬裙與黑絲，手持魔導書，星光與魔法陣在身邊流動。
+詞：
+witch outfit, pointed hat, off-shoulder corset top, plunging neckline, layered puffy skirt, black stockings, zettai ryouiki, midnight blue and deep purple palette, star ornaments, grimoire in hand, magic circle glowing, floating stars, mysterious half-lidded eyes, velvet and sheer tulle texture contrast, moonlit tower
+
+============================================================
+十三、輕甲與靈巧防禦服飾款（輕甲類型）　面相：英氣、威嚴
+============================================================
+說明：輕甲類型：肩甲與胸甲疊在貼身短上衣上，露肩露腹，皮革束帶與短裙，長筒戰靴，英氣颯爽。
+詞：
+light armor outfit, pauldrons, breastplate over fitted cropped top, bare midriff, leather straps, tassets, mini skirt, long boots, zettai ryouiki, fingerless gauntlets, metal and leather and cloth texture contrast, heroic stance, determined expression, silver and dark red palette, battle arena with energy sparks
+
+============================================================
+十四、高機能東方典雅旗袍款　面相：高冷、知性
+============================================================
+說明：旗袍結合機能面料：腰部中央使用半透明漸變薄紗，向下漸變為不透明下擺，幾何鏤空花紋、高衩、側臀鏤空，配中國結髮飾與金色滾邊。
+詞：
+high-tech qipao, cheongsam, semi-transparent gradient panel at waist, sheer to opaque fade, geometric lattice cutout, high slit, side hip cutout, mandarin collar, gold trim, chinese knot hair ornament, black and gold and jade green palette, sleek silk and functional fabric texture, elegant cool expression, long legs in sheer stockings, neon lanterns and calm night city
+
+============================================================
+十五、專屬侍從蕾絲女僕裝　面相：可愛、元氣
+============================================================
+說明：改良女僕裝：露肩短版蕾絲上衣、多層蕾絲短裙與圍裙、頭飾、吊襪帶與絲襪，身後蕾絲飄帶隨粒子流飛舞。
+詞：
+lace maid outfit, off-shoulder, cropped lace top, bare midriff, layered lace mini skirt, frilled apron, maid headdress, garter straps, white thighhighs, zettai ryouiki, long lace ribbons streaming behind, cheerful cute smile, black and white and pink palette, delicate lace and satin texture contrast, bright academy dormitory room
+
+============================================================
+附註：混搭用法
+============================================================
+若要「跨界混搭」，從兩個款式各取一半：上半身用其中一組的上衣與領口詞，下半身用另一組的裙或褲詞；配色改成共同色系（例如修女服 × 魔女統一為黑、深紫、夜空藍），並補一件連接兩個風格的配件詞（例如 black stockings, cross pendant）。
