@@ -10,7 +10,7 @@
 6. 這些詞沒有實際生成圖片測試過，各模型對標籤的反應不同，需要你自己微調權重。
 
 共用前綴
-masterpiece, best quality, anime illustration, highly detailed, 1girl, solo, adult woman, mature figure, long hair reaching waist, glowing particles of light drifting in the air, floating sky island academy in background, volumetric lighting, dynamic pose, full body, absolute territory, thighhighs with bare thigh gap, no shorts underneath
+masterpiece, best quality, anime illustration, highly detailed, 1girl, solo, adult woman, mature figure, pale pinkish-white skin tone, skin color #FFE5D9, long hair reaching waist, glowing particles of light drifting in the air, floating sky island academy in background, volumetric lighting, dynamic pose, full body, absolute territory, thighhighs with bare thigh gap, no shorts underneath
 
 共用負面詞
 nsfw, nudity, nipples, exposed genitals, underwear visible, panties, bloomers, safety shorts, shorts under skirt, child, loli, young girl, lowres, bad anatomy, bad hands, extra fingers, deformed, text, watermark, signature, cropped
