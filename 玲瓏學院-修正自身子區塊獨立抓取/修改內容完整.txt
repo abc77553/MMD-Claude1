@@ -1,0 +1,131 @@
+玲瓏學院｜修正自身子區塊獨立抓取
+
+問題原因
+使用者提供的回覆有 [狀態]、[武器與服飾]、[背包]、[異能] 四個子區塊，但沒有 [自身資訊] 與 [/自身資訊] 外層。
+上一版雖然不依賴 HYS資訊外層，自身資料仍只抓完整的自身資訊區塊，因此這種格式會漏抓。
+這不是同一區塊重複造成的問題。
+
+修正方式
+增加自身子區塊轉存，讓四個子區塊即使沒有自身資訊外層，也能被保存與讀取。
+保留完整 [自身資訊]…[/自身資訊] 格式的既有解析。
+沒有完整自身外層時，以完整的 [狀態]…[/狀態] 作為歸屬起點，在下一個人物或其他資訊區塊前，讀取所屬的武器與服飾、背包與異能。
+完整的其他人物頁先排除，不把敵方、隊友、互動對象及可互動人員的異能當成玩家的異能。
+若只有狀態，其他缺少的子頁保留缺資料顯示，不從其他人物或其他輪次補資料。
+閱讀頁也同步接受這種格式，並把資料區塊從閱讀正文移除，切換歷史與最新輪次時均可更新自身面板。
+
+標籤是否重複
+使用者這輪的四個自身子區塊各有一對開始與結束標籤，缺少的是自身資訊外框。
+整體輸出格式允許不同人物共用 [異能] 這個子區塊名稱；[武器與服飾] 也會出現在自身與隊友資料中。
+這些同名標籤不改名，依所屬人物區塊區分。
+
+保留的內容
+第零輪預建、開始遊戲後的欄位顯隱、收合操作、可互動人員原有欄位、配色、背景、側欄配置與計算規則保留。
+敵方、隊友、互動人物及其他資訊區塊的獨立抓取機制保留。
+只修改正規表示式。世界書、角色設定、輸出格式、額外指示與「玲瓏學院-各資訊區塊獨立抓取」逐位元組相同，未改動模型輸出契約，也沒有重編 UID。
+
+比對與檢查
+新增「HYS自身子區塊轉存」，同步內嵌引擎與閱讀頁的自身資料解析及閱讀正文清理。
+各人物欄位清單、欄位繪製、顯隱判斷與收合函式未改動。
+全部正規表示式編譯、外層 JavaScript、解碼後引擎與閱讀頁的語法檢查通過，規則識別碼沒有重複；重新解碼後與修改來源一致。
+
+實際測試範圍
+依使用者貼出的標籤結構，節錄姓名、生命、能值、服飾、道具及異能等代表資料建立測試；不是重新生成或改寫使用者的整輪劇情。
+舊解析器確實無法在這種結構中取得自身資訊。
+Chromium 模擬聊天頁面與 SDK 測試：缺少自身外框、完整自身外框、缺少自身結束、缺少自身開頭，四個自身分頁皆可讀取。
+同時放入敵方、隊友與互動人物的異能，確認不混進自身頁。缺少自身或狀態未閉合時，不把其他人物誤認為玩家；只有狀態時不挪用其他人物的異能。
+閱讀頁歷史／最新輪次切換、正文資料隱藏及手機尺寸的四頁讀取通過。
+另外回歸正常外層、完全沒有 HYS資訊外層、單一敵人標籤缺少、多輪隔離、任務及區域建築、固定面板與第零輪預建等既有流程。
+瀏覽器測試沒有未處理的 JavaScript 錯誤。
+提供的 Hearthroom 網址可回傳公開應用程式頁面，但未取得登入後的對話內容；本次以使用者貼出的原始格式核對，未在登入後的實際頁面操作驗證。
+
+交付
+正規表示式.json 可單獨匯入。ZIP 含五份設定檔與修改說明。
+修改內容完整.txt 獨立提供，不放入 ZIP。
+
+新增子區塊轉存正則全文
+{
+  "id": 126,
+  "scriptName": "HYS自身子區塊轉存",
+  "findRegex": "/\\[(狀態|武器與服飾|背包|異能)\\]((?:(?!\\[\\1\\])[\\s\\S])*?)\\[\\/\\1\\]/g",
+  "replaceString": "<span class=\"hys9-snapshot hys9-self-source\" hidden style=\"display:none!important\">[$1]$2[/$1]</span>",
+  "disabled": false
+}
+
+內嵌引擎完整修改差異
+--- 基礎內嵌引擎
++++ 交付內嵌引擎
+@@ -6 +6 @@
+-if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-independent-info'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
++if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-independent-self-parts'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
+@@ -30,0 +31,8 @@
++function selfInfo(text){
++ const src=String(text||'').replace(/[\[【]\/?HYS(?:資訊|资讯)[\]】]/gi,''),explicit=infoBlock(src,'自身資訊');if(explicit!==null)return explicit;
++ const rest=src.replace(/\[(敵方[一二三四五]|隊友[一二]|對象[一二三]|可互動人員)\]((?:(?!\[\1\])[\s\S])*?)\[\/\1\]/g,'\n[HYS其他人物]\n');
++ const anchors=[...rest.matchAll(/\[狀態\]/g)];for(let i=anchors.length-1;i>=0;i--){
++  let scope=rest.slice(anchors[i].index);const boundary=/\[(?:\/?自身資訊|敵方資訊|隊友資訊|當前互動人物|敵方[一二三四五]|隊友[一二]|對象[一二三]|可互動人員|可前往區域|可互動建築|任務|HYS其他人物|HYS劇情統整|HYS剧情统整|數據驗證|数据验证)\]/.exec(scope);if(boundary)scope=scope.slice(0,boundary.index);
++  if(infoBlock(scope,'狀態')===null)continue;return ['狀態','武器與服飾','背包','異能'].map(tag=>{const body=infoBlock(scope,tag);return body===null?'':'['+tag+']\n'+body+'\n[/'+tag+']';}).filter(Boolean).join('\n');
++ }return null;
++}
+@@ -36 +44 @@
+- ['自身資訊','可互動人員','可前往區域','可互動建築','任務'].forEach(tag=>{const body=infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));});
++ ['自身資訊','可互動人員','可前往區域','可互動建築','任務'].forEach(tag=>{const body=tag==='自身資訊'?selfInfo(src):infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));});
+@@ -1516 +1524 @@
+-W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-independent-info',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
++W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-independent-self-parts',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
+
+閱讀頁完整修改差異
+--- 基礎閱讀頁
++++ 交付閱讀頁
+@@ -3 +3 @@
+-const W=window,D=document,KEY='__jianghuSceneReader',REV='hys-reader-independent-info-20261020';
++const W=window,D=document,KEY='__jianghuSceneReader',REV='hys-reader-independent-self-parts-20261020';
+@@ -64,0 +65,8 @@
++function selfInfo(text){
++ const src=String(text||'').replace(/[\[【]\/?HYS(?:資訊|资讯)[\]】]/gi,''),explicit=infoBlock(src,'自身資訊');if(explicit!==null)return explicit;
++ const rest=src.replace(/\[(敵方[一二三四五]|隊友[一二]|對象[一二三]|可互動人員)\]((?:(?!\[\1\])[\s\S])*?)\[\/\1\]/g,'\n[HYS其他人物]\n');
++ const anchors=[...rest.matchAll(/\[狀態\]/g)];for(let i=anchors.length-1;i>=0;i--){
++  let scope=rest.slice(anchors[i].index);const boundary=/\[(?:\/?自身資訊|敵方資訊|隊友資訊|當前互動人物|敵方[一二三四五]|隊友[一二]|對象[一二三]|可互動人員|可前往區域|可互動建築|任務|HYS其他人物|HYS劇情統整|HYS剧情统整|數據驗證|数据验证)\]/.exec(scope);if(boundary)scope=scope.slice(0,boundary.index);
++  if(infoBlock(scope,'狀態')===null)continue;return ['狀態','武器與服飾','背包','異能'].map(tag=>{const body=infoBlock(scope,tag);return body===null?'':'['+tag+']\n'+body+'\n[/'+tag+']';}).filter(Boolean).join('\n');
++ }return null;
++}
+@@ -70 +78 @@
+- ['自身資訊','可互動人員','可前往區域','可互動建築','任務'].forEach(tag=>{const body=infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));});
++ ['自身資訊','可互動人員','可前往區域','可互動建築','任務'].forEach(tag=>{const body=tag==='自身資訊'?selfInfo(src):infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));});
+@@ -74 +82 @@
+- return String(text||'').replace(/\[(敵方[一二三四五]|隊友[一二]|對象[一二三]|自身資訊|可互動人員|可前往區域|可互動建築|任務)\]((?:(?!\[\1\])[\s\S])*?)\[\/\1\]/g,'').replace(/\[(敵方資訊|隊友資訊|當前互動人物)\][\s\S]*?\[\/\1\]/g,'').replace(/[\[【]\/?HYS(?:資訊|资讯)[\]】]|\[\/?(?:敵方資訊|隊友資訊|當前互動人物)\]/gi,'').replace(/^[ \t]*(?:輪數|轮数)\s*[：:]\s*\d+[ \t]*$/gm,'');
++ return String(text||'').replace(/\[(敵方[一二三四五]|隊友[一二]|對象[一二三]|自身資訊|可互動人員|可前往區域|可互動建築|任務|狀態|武器與服飾|背包|異能)\]((?:(?!\[\1\])[\s\S])*?)\[\/\1\]/g,'').replace(/\[(敵方資訊|隊友資訊|當前互動人物)\][\s\S]*?\[\/\1\]/g,'').replace(/[\[【]\/?HYS(?:資訊|资讯)[\]】]|\[\/?(?:敵方資訊|隊友資訊|當前互動人物)\]/gi,'').replace(/^[ \t]*(?:輪數|轮数)\s*[：:]\s*\d+[ \t]*$/gm,'');
+
+自身子區塊獨立抓取測試結果.json
+{
+  "rules": 126,
+  "reproduction": "使用者原文的標籤結構缺少自身資訊外層，舊解析器確實抓不到；以相同結構及代表資料測試修正",
+  "results": [
+    "bare：狀態、武器與服飾、背包、異能均讀取",
+    "wrapped：狀態、武器與服飾、背包、異能均讀取",
+    "missing-close：狀態、武器與服飾、背包、異能均讀取",
+    "missing-open：狀態、武器與服飾、背包、異能均讀取",
+    "no-self：不誤抓其他人物",
+    "broken-status：不誤抓其他人物",
+    "只有狀態時不挪用其他人物異能",
+    "閱讀頁歷史與最新輪次均讀到四頁，正文不露出資料",
+    "手機尺寸四頁讀取"
+  ],
+  "errors": []
+}
+
+自身修正後資訊抓取回歸測試結果.json
+{
+  "rules": 126,
+  "results": [
+    "正常外層",
+    "完全沒有外層",
+    "單一人物缺少結束標籤不影響其他人物",
+    "不同訊息不混用資料",
+    "新輪缺資料不沿用舊人物",
+    "閱讀頁歷史輪次獨立抓取，正文與六條建議保留",
+    "固定面板更新",
+    "第零輪預建與開始遊戲後顯隱保留"
+  ],
+  "scope": "敵方五頁、隊友兩頁、互動對象三頁、自身、可互動人員、區域、建築與任務",
+  "errors": []
+}

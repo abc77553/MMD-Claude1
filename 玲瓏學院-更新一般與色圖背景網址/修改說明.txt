@@ -1,0 +1,28 @@
+更新一般與色圖背景網址
+
+以本次最新上傳五份檔案為基礎，只更新正規表示式內六個背景網址。
+
+一般／旗袍
+https://assets.harperharbor.com/u/uef0e2368d75640058cadc5a7bd8aea21/%E7%8E%B2%E7%93%8F%E5%AD%B8%E9%99%A2/%E9%AB%98%E6%A9%9F%E8%83%BD%E6%9D%B1%E6%96%B9%E5%85%B8%E9%9B%85%E6%97%97%E8%A2%8D%E6%AC%BE.jpg
+
+一般／修女服
+https://assets.harperharbor.com/u/uef0e2368d75640058cadc5a7bd8aea21/%E7%8E%B2%E7%93%8F%E5%AD%B8%E9%99%A2/%E4%BF%AE%E5%A5%B3%E6%9C%8D%E6%94%B9%E8%89%AF%E6%AC%BE.jpg
+
+一般／神官袍
+https://assets.harperharbor.com/u/uef0e2368d75640058cadc5a7bd8aea21/%E7%8E%B2%E7%93%8F%E5%AD%B8%E9%99%A2/%E7%A5%9E%E5%AE%98%E8%A2%8D%E6%94%B9%E8%89%AF%E6%AC%BE.jpg
+
+一般／魔女服
+https://assets.harperharbor.com/u/uef0e2368d75640058cadc5a7bd8aea21/%E7%8E%B2%E7%93%8F%E5%AD%B8%E9%99%A2/%E9%AD%94%E5%A5%B3%E7%A5%9E%E7%A7%98%E9%AD%94%E5%B9%BB%E6%9C%8D%E9%A3%BE%E6%AC%BE.jpg
+
+一般／西裝服
+https://assets.harperharbor.com/u/uef0e2368d75640058cadc5a7bd8aea21/%E7%8E%B2%E7%93%8F%E5%AD%B8%E9%99%A2/%E8%A5%BF%E8%A3%9D%E5%A4%96%E5%A5%97%E6%94%B9%E8%89%AF%E6%AC%BE.jpg
+
+色圖／修女服
+https://assets.harperharbor.com/u/uef0e2368d75640058cadc5a7bd8aea21/%E7%8E%B2%E7%93%8F%E5%AD%B8%E9%99%A2/%E4%BF%AE%E5%A5%B3%E6%9C%8D%E6%94%B9%E8%89%AF%E6%AC%BE2.mp4
+
+一般區塊五張圖片改用指定的玲瓏學院目錄；旗袍檔名同時使用指定的不含尾碼版本。色圖區塊修女服改用指定 MP4，維持影片背景類型。
+按鈕名稱、分類、背景選擇識別、預設值、靜音循環播放、閱讀頁同步、配色、透明度及其他功能保持不變。
+
+比對：解碼後引擎僅六個網址不同；其他正則規則、閱讀頁程式及非引擎資料保持相同。其他四份檔案與本次上傳逐位元組相同。
+檢查：JSON、正則編譯與 JavaScript 語法檢查通過。
+本次沒有在實際 Hearthroom 測試，未驗證遠端圖片載入及 MP4 播放。
