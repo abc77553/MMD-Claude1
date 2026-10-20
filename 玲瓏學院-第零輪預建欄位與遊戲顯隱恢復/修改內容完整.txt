@@ -1,0 +1,181 @@
+玲瓏學院｜第零輪預建欄位與遊戲顯隱恢復
+
+適用面板
+敵方資訊、隊友資訊、自身資訊、當前互動人物。
+可互動人員維持原樣，不補欄位，也不新增色色欄或淫紋欄。
+
+預先顯示的時機
+第零輪開場白時，依四個面板各自既有欄位清單預先建立欄位；色色欄與淫紋欄也會預先出現，預設收合，可操作展開與收合。
+剛載入開場白、尚未取得任何快照時，同樣可預先查看欄位。
+第一輪起不再套用開場白的強制完整欄位顯示。已有快照但缺少輪數時，也不會只因輪數缺失而視為開場白。
+
+遊戲中的顯隱
+四個面板重新呼叫原有顯隱判斷函式，不改寫親密狀態、淫紋狀態、性別、敏感度及特定技能的判斷公式。
+色色欄依既有親密條件顯示；不符合條件時隱藏整個區塊。
+淫紋欄依既有淫紋狀態條件顯示；不符合條件時隱藏整個區塊。
+顯示條件彼此獨立：可以只顯示色色欄、只顯示淫紋欄、同時顯示，或都不顯示。
+區塊內的欄位仍遵守各自原有顯隱條件，包含男性相關欄位排除、預設敏感度隱藏、特定技能欄位及相關累積值欄位。
+遊戲開始後的空白人物槽也會套用色色與淫紋欄位的顯隱判斷，不因資料空白而保留開場白的兩個區塊。
+顯示區塊仍可點擊標題或展開／收合按鈕操作。同一人物的收合狀態記憶保留。
+固定面板、快照更新與閱讀快照都沿用當前顯示輪次；從開場白快照返回目前遊戲輪次後，恢復遊戲中的顯隱。
+
+修正原因
+上一版全程使用完整欄位清單，繪製時略過原有顯隱判斷。本次把該例外限於開場白，使預先顯示與遊戲中的條件顯示分開生效。
+
+比對結果
+以「玲瓏學院-人物欄位預建與色色淫紋統一收合」為基礎。
+正規表示式僅修改內嵌引擎的人物欄位繪製條件與引擎版本識別。
+四個人物面板及可互動人員的欄位清單、原有顯隱判斷函式與收合操作函式均相同。
+其他正則、劇情閱讀頁、雙欄側邊按鈕、配色、背景連結及數據驗證處理保持相同。
+世界書、角色設定、輸出格式、額外指示與基礎版本逐位元組相同；沒有修改世界書條目或重編 UID。
+
+檢查與測試
+JSON 解析、全部正規表示式編譯、外層 JavaScript 與解碼後引擎語法檢查通過；重新解碼與修改來源一致。
+以 Chromium 與模擬聊天頁面／SDK 測試開場白、第一輪日常、符合親密條件、符合淫紋條件、兩者同時符合，以及條件結束後再次隱藏。
+四個面板已有資料時的欄位顯隱，逐項與基礎版本的原有顯隱判斷結果比對。
+另測試遊戲中的空白人物槽、缺少輪數、男性欄位、預設及非預設敏感度、特定技能欄位、零值資料、固定面板跨輪更新與閱讀快照切換。
+手機尺寸下四個面板的條件顯隱及收合操作通過。可互動人員維持原有欄位與顯隱行為。
+瀏覽器測試沒有未處理 JavaScript 錯誤。未在使用者登入後的 Hearthroom 實際頁面測試。
+
+交付
+正規表示式.json 可單獨匯入。同名 ZIP 內含五份設定檔及修改說明。
+修改內容完整.txt 分開提供，不放入 ZIP。
+
+人物欄位繪製函式全文
+function paintRows(host,text,rows,kind,slot=''){
+ host.replaceChildren();const empty=blankSnap(text),map=empty?{}:parseFields(text),person=['self','enemy','team','partner'].includes(kind),prebuild=person&&(lastRound===0||(lastRound<0&&!lastText));
+ if(!map['性特徵']){const sf=sexFeat(map);if(sf)map['性特徵']=sf;}
+ const identity=map['姓名']||slot||kind;let target=host,pend=null;
+ const flush=()=>{if(pend&&(prebuild||pend.n))host.append(pend.det);pend=null;target=host;};
+ rows.forEach(labels=>{
+  if(typeof labels==='string'){flush();const det=personInfoFold(labels.slice(1),kind,identity);pend={det,n:0};target=det;return;}
+  const use=prebuild?labels:labels.filter(k=>!hideKey(k,map,text,kind,person&&ERO_KEYS[k]?false:empty)&&!(k==='敏感度'&&!empty&&missingInfo(map[k])));if(!use.length)return;
+  const row=el('div','status-row status-cols-'+use.length);if(labels[0]==='姓名'&&(labels.includes('性別')||labels.includes('玩家性別')))row.classList.add('hys-person-identity');if(labels[0]==='年齡'&&labels.includes('顏值'))row.classList.add('hys-person-age');
+  use.forEach(k=>{let v=map[k];if(missingInfo(v))v='';
+   const notApplicable=prebuild&&!v&&isMale(map)&&['罩杯','三圍','陰道長度','宮頸至宮底總深度','陰道狀況','子宮狀況'].includes(k);
+   const value=prebuild?(v||(notApplicable?'不適用':empty&&k==='姓名'?infoEmpty(kind):'尚無相關資料')):(v||(empty?infoEmpty(kind):'尚無相關資料'));
+   const blk=el('div','attribute-block',((k==='對玩家的認知'&&map['__認知標籤'])||k)+'：'+value);blk.dataset.field=k;row.append(blk);
+   if(kind==='enemy'&&k==='敵方意圖'&&v){const et=intentEst(text,v);if(et){const sm=el('small','muted');sm.style.cssText='display:block;white-space:pre-line;margin-top:0.3em';sm.textContent=et;blk.append(sm);}}
+  });target.append(row);if(pend)pend.n++;
+ });flush();
+}
+
+
+完整修改差異
+--- 上一版內嵌引擎
++++ 交付內嵌引擎
+@@ -6 +6 @@
+-if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-fixed-person-fields'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
++if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-opening-person-visibility'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
+@@ -154 +154 @@
+- host.replaceChildren();const empty=blankSnap(text),map=empty?{}:parseFields(text),fixed=['self','enemy','team','partner'].includes(kind);
++ host.replaceChildren();const empty=blankSnap(text),map=empty?{}:parseFields(text),person=['self','enemy','team','partner'].includes(kind),prebuild=person&&(lastRound===0||(lastRound<0&&!lastText));
+@@ -157 +157 @@
+- const flush=()=>{if(pend&&(fixed||pend.n))host.append(pend.det);pend=null;target=host;};
++ const flush=()=>{if(pend&&(prebuild||pend.n))host.append(pend.det);pend=null;target=host;};
+@@ -160 +160 @@
+-  const use=fixed?labels:labels.filter(k=>!hideKey(k,map,text,kind,empty)&&!(k==='敏感度'&&!empty&&missingInfo(map[k])));if(!use.length)return;
++  const use=prebuild?labels:labels.filter(k=>!hideKey(k,map,text,kind,person&&ERO_KEYS[k]?false:empty)&&!(k==='敏感度'&&!empty&&missingInfo(map[k])));if(!use.length)return;
+@@ -163,2 +163,2 @@
+-   const notApplicable=fixed&&!v&&isMale(map)&&['罩杯','三圍','陰道長度','宮頸至宮底總深度','陰道狀況','子宮狀況'].includes(k);
+-   const value=fixed?(v||(notApplicable?'不適用':empty&&k==='姓名'?infoEmpty(kind):'尚無相關資料')):(v||(empty?infoEmpty(kind):'尚無相關資料'));
++   const notApplicable=prebuild&&!v&&isMale(map)&&['罩杯','三圍','陰道長度','宮頸至宮底總深度','陰道狀況','子宮狀況'].includes(k);
++   const value=prebuild?(v||(notApplicable?'不適用':empty&&k==='姓名'?infoEmpty(kind):'尚無相關資料')):(v||(empty?infoEmpty(kind):'尚無相關資料'));
+@@ -1496 +1496 @@
+-W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-fixed-person-fields',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
++W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-opening-person-visibility',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
+
+瀏覽器測試結果
+{
+  "rules": 123,
+  "results": [
+    {
+      "scenario": "尚無快照的開場白",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "第零輪空白資料",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "第零輪已有部分資料",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "第一輪非親密且無標記",
+      "panels": 4,
+      "groups": []
+    },
+    {
+      "scenario": "符合親密條件，無標記",
+      "panels": 4,
+      "groups": [
+        "色色欄"
+      ]
+    },
+    {
+      "scenario": "有標記，非親密",
+      "panels": 4,
+      "groups": [
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "同時符合兩組條件",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "條件結束後重新隱藏",
+      "panels": 4,
+      "groups": []
+    },
+    {
+      "scenario": "遊戲開始後空白人物槽",
+      "panels": 4,
+      "groups": []
+    },
+    {
+      "scenario": "男性及預設敏感度維持原規則",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "非預設敏感度及特定技能欄位",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "缺少輪數的實際資料不當成開場白",
+      "panels": 4,
+      "groups": []
+    }
+  ],
+  "pinned": "開場白固定面板進入遊戲後重新套用顯隱",
+  "reader": "第零輪預建，返回目前輪次後恢復動態顯隱",
+  "folds": "顯示時可展開與收合，同一人物更新保留狀態",
+  "near": "原有欄位與顯隱規則不變，沒有新增分組",
+  "mobile": "四個面板依條件顯隱，兩個收合區塊可操作",
+  "errors": []
+}
