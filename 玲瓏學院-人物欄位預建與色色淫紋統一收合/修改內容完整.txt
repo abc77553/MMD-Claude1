@@ -1,0 +1,161 @@
+玲瓏學院｜人物欄位預建與色色、淫紋欄收合
+
+修改範圍
+敵方資訊、隊友資訊、自身資訊、當前互動人物。
+可互動人員維持原本欄位與顯示條件，不補欄位，也不新增色色欄或淫紋欄。
+
+顯示方式
+四個面板會依各自既有欄位清單預先建立欄位；空白人物槽、未進行親密互動、未提供數值或尚無淫紋時，欄位仍存在。
+缺少的數值顯示「尚無相關資料」；沒有建立人物時，姓名保留原有空槽提示。已知男性的缺值女性生理欄位顯示「不適用」。
+既有資料照實顯示，包含零值、「無」及預設敏感度。
+各面板原有欄位名稱及排列保留，不把不同面板的欄位強行改成同一份清單。
+
+收合方式
+四個面板各自保有色色欄與淫紋欄，預設收合。點擊標題或旁邊的展開／收合按鈕可操作。
+隊友資訊與當前互動人物原有的相關欄位分別放入這兩個收合區塊。
+同一次載入期間，依面板及人物姓名／空槽分別記住展開狀態；人物切換、資料更新及固定／取消固定後可還原。重新載入頁面後回到預設收合。
+
+比對結果
+以「玲瓏學院-融合數據驗證規則與輸出模板」為基礎，保留此前已接受的修改。
+正規表示式只調整內嵌引擎的人物欄位繪製、隊友與互動人物分組，以及人物槽的收合狀態識別。
+可互動人員的原有欄位清單與專用繪製函式相同；通用繪製函式維持它原有的篩選與缺值顯示行為。
+其他正則、閱讀頁、雙欄側邊按鈕、背景連結及數值驗證處理均未變動。
+世界書、角色設定、輸出格式、額外指示與基礎版本逐位元組相同。沒有新增或修改世界書條目，也沒有重編 UID。
+
+檢查與測試
+JSON 解析、全部正規表示式編譯、外層 JavaScript 與解碼後引擎語法檢查通過；重新解碼後與修改來源一致。
+以 Chromium 和模擬聊天頁面／SDK 測試四個面板的空白及部分資料：既有欄位完整建立，兩個收合區塊可操作。
+已測試人物切換、快照更新、固定與取消固定時的收合狀態，以及手機尺寸下四個面板的收合區塊。
+已核對零值、「無」及敏感度資料保留，並確認可互動人員沒有新增收合區塊。
+瀏覽器測試沒有未處理 JavaScript 錯誤。未在使用者登入後的 Hearthroom 實際頁面測試。
+
+交付
+正規表示式.json 可單獨下載匯入；同名 ZIP 含五份設定檔與修改說明。
+修改內容完整.txt 獨立提供，不放入 ZIP。
+
+內嵌引擎完整修改差異
+--- 修改前內嵌引擎
++++ 交付內嵌引擎
+@@ -3,7 +3,7 @@
+ const W=window,D=document,KEY='__hysHearthV1';
+ function decode(s){return decodeURIComponent(escape(atob(s)));}
+ function resource(cls){const value=W.__hysResources&&W.__hysResources[cls];if(typeof value!=='string')throw Error('缺少資源 '+cls);return value;}
+-if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-unified-validation'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
++if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-fixed-person-fields'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
+ const cfg=JSON.parse(resource('hys9-config')),css=resource('hys9-css')+"\n.drawer{display:flex;flex-direction:column;overflow:hidden!important;padding:0!important}.drawer>header{flex:none;margin:0;padding:16px 20px;position:static;display:flex;align-items:center;gap:12px}.drawer>header h2{flex:0 1 auto;min-width:0;margin:0}.drawer>header .counter{flex:1;min-width:0;margin:0;font-size:12px;white-space:normal}.drawer>header button{flex:none;margin-left:auto}.drawer>nav{flex:none;position:static!important;margin:0;padding:0 20px 12px}.hys-panel-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 20px 20px}.hys-panel-scroll .self-tabs{position:static!important}.hys-art-drawer>.hys-art-fields{flex:1;min-height:0;overflow:auto;padding:0 20px 20px;align-content:start;grid-auto-rows:max-content}.drawer.hys-art-drawer{overflow:hidden!important}.drawer.hys-art-drawer>:not(header):not(nav):not(.hys-panel-resizer):not(.hys-art-fields):not(.hys-sect-popup){flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}.drawer.hys-art-drawer>header{position:static;top:auto;padding:16px 20px}@media(max-width:760px){.drawer>header{padding:12px;gap:8px}.drawer>header h2{font-size:17px}.drawer>header .counter{font-size:11px}.drawer>nav{padding:0 12px 10px}.hys-panel-scroll,.hys-art-drawer>.hys-art-fields{padding:0 12px 12px}}\n"+"\n.drawer>nav.hys-self-tabs{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px}.hys-self-tabs>button{min-width:0!important;width:100%!important;padding:8px 3px!important;white-space:normal;overflow-wrap:anywhere}\n"+"\n.drawer>nav.hys-location-tabs{display:block!important;overflow-x:hidden!important;min-width:0!important}.hys-location-tab-grid{--hys-tab-width:calc(4em + var(--hys-control-width,1px) + var(--hys-control-width,1px));display:grid!important;grid-template-columns:repeat(auto-fill,min(var(--hys-tab-width),calc((100% - 16px)/5)))!important;gap:4px!important;justify-content:start!important;width:100%;min-width:0!important;max-width:100%}.hys-location-tab-grid>button{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:var(--hys-tab-width)!important;padding:8px 0!important;font-size:inherit!important;white-space:normal!important;overflow-wrap:anywhere;flex:none!important}\n";
+ const TRAITS=["溫柔體貼", "陽光開朗", "沉穩冷靜", "堅韌勇敢", "幽默風趣", "慷慨大度", "正直誠實", "溫柔傲嬌", "謙虛內斂", "忠誠守護", "積極進取", "隨性浪子", "自戀自我", "保守傳統", "三無體貼", "陽光隨性浪子", "慵懶誘惑", "細膩敏銳", "豪爽義氣", "熱忱認真", "三無誘惑", "毒舌吐槽", "天然呆", "高冷疏離", "害羞膽怯", "孩子氣", "腹黑", "話癆"];
+ const titles=['敵方資訊','隊友資訊','自身資訊','當前互動人物','可互動人員','可前往區域','任務','操作表單','學院圖鑑','數據驗證','擲骰計算','劇情統整','面板調整','功能測試'];
+@@ -138,22 +138,43 @@
+ function parseFields(text){const map={};let src=String(text||'').replace(/\{\{user\}\}/gi,'玩家');src=src.replace(/\[(武器與服飾|異能|背包|裝備|技能)\][\s\S]*?\[\/\1\]/g,'');src.split(/\n/).forEach(line=>{line=line.trim();if(!line)return;const parts=line.split(/[｜|]/);parts.forEach(part=>{const q=/^\s*([^：:]{1,24})\s*[：:]\s*(.*)$/.exec(part);if(q){const k=q[1].trim();if(map[k]==null)map[k]=q[2].trim();}});});[['好感度階段','階段'],['好感度階段','情感階段'],['肢體狀態','狀態'],['敵方意圖','當前行動']].forEach(([a,b])=>{if(!map[a]&&map[b])map[a]=map[b];});Object.keys(map).forEach(k=>{if(/^對.{1,12}的認知$/.test(k)&&k!=='對玩家的認知'){map['對玩家的認知']=map[k];map['__認知標籤']=k;}});return map;}
+ const SELF_ROWS=[["姓名","玩家性別"],["年齡","顏值"],["身分"],["身高","罩杯","三圍"],["體態特徵"],["個性"],["容貌傳播度"],["總生命","要害"],["左臂","右臂"],["左腳","右腳"],["肢體狀態"],["能值","能值等級"],["能量","能量自動恢復","戰意值"],["專屬資源"],["先天力量","先天敏捷"],["先天體質","先天悟性"],["力量","敏捷"],["體質","悟性"],["攻擊力","防禦力"],["命中","閃避","招架"],["應對方式"],["性特徵"],["陰道長度","宮頸至宮底總深度"],["用戶女性偏好"],["性技"],"#色色欄",["色色體力值"],["高潮進度值"],["交合烈度"],["敏感度"],["性愛體位"],["性愛狀態"],["伸縮狀態"],["伸縮比例"],"#淫紋欄",["淫紋階段"],["淫紋高潮開關","淫紋高潮疊加次數"],["淫紋射出精液累積","淫紋射出精液目標"],["淫紋高潮累積","淫紋高潮目標"],["淫紋下次進化條件"]];
+ const ENEMY_ROWS=[["姓名","性別"],["顏值"],["個性"],["身分"],["身高","罩杯","三圍"],["體態特徵"],["總生命","要害"],["左臂","右臂"],["左腳","右腳"],["肢體狀態"],["能值","能值等級"],["能量","能量自動恢復","戰意值"],["先天力量","先天敏捷"],["先天體質","先天悟性"],["力量","敏捷"],["體質","悟性"],["攻擊力","防禦力"],["命中","閃避","招架"],["好感度"],["敵方意圖"],["對玩家的認知"],["陰道長度","宮頸至宮底總深度"],"#色色欄",["色色體力值"],["高潮進度值"],["交合烈度"],["當前外觀"],["敏感度"],["陰道狀況"],["子宮狀況"],["後庭狀況"],["尿道狀況"],"#淫紋欄",["淫紋階段"],["淫紋高潮開關","淫紋高潮疊加次數"],["淫紋被射入精液累積","淫紋被射入精液目標"],["淫紋高潮累積","淫紋高潮目標"],["淫紋下次進化條件"]];
+-const TEAM_ROWS=[["姓名","性別"],["年齡","顏值"],["身分"],["身高","罩杯","三圍"],["體態特徵"],["個性"],["容貌傳播度"],["總生命","要害"],["左臂","右臂"],["左腳","右腳"],["肢體狀態"],["能值","能值等級"],["能量","能量自動恢復","戰意值"],["先天力量","先天敏捷"],["先天體質","先天悟性"],["力量","敏捷"],["體質","悟性"],["攻擊力","防禦力"],["命中","閃避","招架"],["好感度","好感度階段"],["對玩家的認知"],["性特徵"],["陰道長度","宮頸至宮底總深度"],["當前動作"],["簡介"],["色色體力值"],["高潮進度值"],["交合烈度"],["當前外觀"],["敏感度"],["陰道狀況"],["子宮狀況"],["後庭狀況"],["尿道狀況"],["淫紋階段"],["淫紋高潮開關","淫紋高潮疊加次數"],["淫紋被射入精液累積","淫紋被射入精液目標"],["淫紋高潮累積","淫紋高潮目標"],["淫紋下次進化條件"]];
+-const PARTNER_ROWS=[["姓名","性別"],["年齡","顏值"],["身分"],["身高","罩杯","三圍"],["體態特徵"],["個性"],["容貌傳播度"],["肢體狀態"],["先天力量","先天敏捷"],["先天體質","先天悟性"],["力量","敏捷"],["體質","悟性"],["好感度","好感度階段"],["對玩家的認知"],["性特徵"],["陰道長度","宮頸至宮底總深度"],["當前動作"],["簡介"],["色色體力值"],["高潮進度值"],["交合烈度"],["當前外觀"],["敏感度"],["陰道狀況"],["子宮狀況"],["後庭狀況"],["尿道狀況"],["淫紋階段"],["淫紋高潮開關","淫紋高潮疊加次數"],["淫紋被射入精液累積","淫紋被射入精液目標"],["淫紋高潮累積","淫紋高潮目標"],["淫紋下次進化條件"]];
++const TEAM_ROWS=[["姓名","性別"],["年齡","顏值"],["身分"],["身高","罩杯","三圍"],["體態特徵"],["個性"],["容貌傳播度"],["總生命","要害"],["左臂","右臂"],["左腳","右腳"],["肢體狀態"],["能值","能值等級"],["能量","能量自動恢復","戰意值"],["先天力量","先天敏捷"],["先天體質","先天悟性"],["力量","敏捷"],["體質","悟性"],["攻擊力","防禦力"],["命中","閃避","招架"],["好感度","好感度階段"],["對玩家的認知"],["性特徵"],["陰道長度","宮頸至宮底總深度"],["當前動作"],["簡介"],"#色色欄",["色色體力值"],["高潮進度值"],["交合烈度"],["當前外觀"],["敏感度"],["陰道狀況"],["子宮狀況"],["後庭狀況"],["尿道狀況"],"#淫紋欄",["淫紋階段"],["淫紋高潮開關","淫紋高潮疊加次數"],["淫紋被射入精液累積","淫紋被射入精液目標"],["淫紋高潮累積","淫紋高潮目標"],["淫紋下次進化條件"]];
++const PARTNER_ROWS=[["姓名","性別"],["年齡","顏值"],["身分"],["身高","罩杯","三圍"],["體態特徵"],["個性"],["容貌傳播度"],["肢體狀態"],["先天力量","先天敏捷"],["先天體質","先天悟性"],["力量","敏捷"],["體質","悟性"],["好感度","好感度階段"],["對玩家的認知"],["性特徵"],["陰道長度","宮頸至宮底總深度"],["當前動作"],["簡介"],"#色色欄",["色色體力值"],["高潮進度值"],["交合烈度"],["當前外觀"],["敏感度"],["陰道狀況"],["子宮狀況"],["後庭狀況"],["尿道狀況"],"#淫紋欄",["淫紋階段"],["淫紋高潮開關","淫紋高潮疊加次數"],["淫紋被射入精液累積","淫紋被射入精液目標"],["淫紋高潮累積","淫紋高潮目標"],["淫紋下次進化條件"]];
+ const NEAR_ROWS=[["姓名","性別"],["年齡","顏值"],["個性"],["身高","罩杯","三圍"],["體態特徵"],["容貌傳播度"],["好感度","好感度階段"],["對玩家的認知"],["陰道長度","宮頸至宮底總深度"],["人物地點","人物追蹤"],["當前動作"],["簡介"]];
+ const BAG_ROWS=[['持有道具']];
+ const ERO_KEYS={'色色體力值':1,'高潮進度值':1,'交合烈度':1,'性愛體位':1,'性愛狀態':1,'伸縮狀態':1,'伸縮比例':1,'當前外觀':1,'敏感度':1,'陰道狀況':1,'子宮狀況':1,'後庭狀況':1,'尿道狀況':1,'淫紋高潮開關':1,'淫紋高潮疊加次數':1,'淫紋階段':1,'淫紋射出精液累積':1,'淫紋射出精液目標':1,'淫紋被射入精液累積':1,'淫紋被射入精液目標':1,'淫紋下次進化條件':1,'淫紋高潮累積':1,'淫紋高潮目標':1};
+ function isMale(map){return /^男/.test(String(map['玩家性別']||map['性別']||''));}
+ function isIntimate(text){const s=String(text||'');const v=k=>{const q=new RegExp(k+'\\s*[：:]\\s*([^\\n]+)');const m=q.exec(s);return m?m[1].trim():'';};const pos=v('性愛體位')||v('性爱体位');const st=v('性愛狀態')||v('性爱状态');const look=v('當前外觀')||v('当前外观');if(pos&&!/^(?:無|无)$/.test(pos))return true;if(st&&!/^(?:無|无)$/.test(st))return true;if(look&&!/^(?:無|无)$/.test(look))return true;const tp=v('色色體力值'),pg=v('高潮進度值');if(tp&&!/^(?:無|无)$/.test(tp))return true;if(pg&&!/^(?:無|无)$/.test(pg))return true;return /前戲開始|正在交合|交合中/.test(s);}
+ function hideKey(k,map,text,kind,empty){if(empty)return false;if(k==='用户偏好'||k==='用戶偏好'||k==='用户女性偏好'||k==='用戶女性偏好')return true;if((k==='罩杯'||k==='三圍')&&isMale(map))return true;if((kind==='self'||kind==='team'||kind==='partner'||kind==='enemy')&&ERO_KEYS[k]&&!/^淫紋/.test(k)&&!isIntimate(text))return true;if((k==='陰道長度'||k==='陰道狀況'||k==='子宮狀況'||k==='宮頸至宮底總深度')&&isMale(map))return true;if((k==='伸縮狀態'||k==='伸縮比例')&&!/天之根/.test(String(text||''))&&!/天之根/.test(map['性技']||''))return true;if(/^淫紋/.test(k)){if(!['淫紋高潮開關','淫紋階段','淫紋高潮疊加次數','淫紋高潮累積'].some(x=>map[x]&&!/^(?:無|无)$/.test(map[x])))return true;if((k==='淫紋射出精液累積'||k==='淫紋射出精液目標'||k==='淫紋被射入精液累積'||k==='淫紋被射入精液目標')&&!map[k])return true;}if(kind==='enemy'&&(k==='陰道狀況'||k==='子宮狀況'||k==='罩杯'||k==='三圍'||k==='陰道長度'||k==='宮頸至宮底總深度')&&missingInfo(map[k]))return true;if(k==='敏感度'){const s=String(map['敏感度']||'');if(/全為\s*1\.0|全部\s*1\.0|^全身\s*1\.0$/.test(s))return true;}return false;}
+-function sexFeat(map){const parts=[];[['肉棒長','肉棒長'],['肉棒粗','肉棒粗'],['小穴外觀','小穴外觀'],['陰道長度','陰道長度'],['宮頸至宮底總深度','宮頸至宮底總深度'],['交合主體','交合主體'],['數量','數量'],['長度','長度'],['粗細','粗細'],['溫度','溫度'],['射精參數','射精參數']].forEach(([k,lab])=>{if(map[k])parts.push(lab+'：'+map[k]);});return parts.join('；');}function paintRows(host,text,rows,kind){host.replaceChildren();const empty=blankSnap(text);if(kind==='enemy'&&empty){const cut=rows.findIndex(r=>typeof r==='string');if(cut>=0)rows=rows.slice(0,cut);}const map=empty?{}:parseFields(text);if(!map['性特徵']){const sf=sexFeat(map);if(sf)map['性特徵']=sf;}let target=host,pend=null;const flush=()=>{if(pend&&pend.n)host.append(pend.det);pend=null;target=host;};rows.forEach(labels=>{if(typeof labels==='string'){flush();const det=sideToggle(el('details','drive-slot'));det.append(el('summary','',labels.slice(1)));pend={det,n:0};target=det;return;}const use=labels.filter(k=>!hideKey(k,map,text,kind,empty)&&!(k==='敏感度'&&!empty&&missingInfo(map[k])));if(!use.length)return;const row=el('div','status-row status-cols-'+use.length);if(labels[0]==='姓名'&&(labels.includes('性別')||labels.includes('玩家性別')))row.classList.add('hys-person-identity');if(labels[0]==='年齡'&&labels.includes('顏值'))row.classList.add('hys-person-age');use.forEach(k=>{let v=map[k];if(missingInfo(v))v='';const blk=el('div','attribute-block',((k==='對玩家的認知'&&map['__認知標籤'])||k)+'：'+(v||(empty?infoEmpty(kind):'尚無相關資料')));row.append(blk);if(kind==='enemy'&&k==='敵方意圖'&&v){const et=intentEst(text,v);if(et){const sm=el('small','muted');sm.style.cssText='display:block;white-space:pre-line;margin-top:0.3em';sm.textContent=et;blk.append(sm);}}});target.append(row);if(pend)pend.n++;});flush();}
++function sexFeat(map){const parts=[];[['肉棒長','肉棒長'],['肉棒粗','肉棒粗'],['小穴外觀','小穴外觀'],['陰道長度','陰道長度'],['宮頸至宮底總深度','宮頸至宮底總深度'],['交合主體','交合主體'],['數量','數量'],['長度','長度'],['粗細','粗細'],['溫度','溫度'],['射精參數','射精參數']].forEach(([k,lab])=>{if(map[k])parts.push(lab+'：'+map[k]);});return parts.join('；');}const personFoldState=new Map();
++function personInfoFold(label,kind,identity){
++ const det=el('details','drive-slot hys-person-fold'),key=JSON.stringify([kind,identity,label]);det.dataset.section=label;det.open=personFoldState.get(key)===true;sideToggle(det);det.append(el('summary','',label));det.addEventListener('toggle',()=>personFoldState.set(key,det.open));return det;
++}
++function paintRows(host,text,rows,kind,slot=''){
++ host.replaceChildren();const empty=blankSnap(text),map=empty?{}:parseFields(text),fixed=['self','enemy','team','partner'].includes(kind);
++ if(!map['性特徵']){const sf=sexFeat(map);if(sf)map['性特徵']=sf;}
++ const identity=map['姓名']||slot||kind;let target=host,pend=null;
++ const flush=()=>{if(pend&&(fixed||pend.n))host.append(pend.det);pend=null;target=host;};
++ rows.forEach(labels=>{
++  if(typeof labels==='string'){flush();const det=personInfoFold(labels.slice(1),kind,identity);pend={det,n:0};target=det;return;}
++  const use=fixed?labels:labels.filter(k=>!hideKey(k,map,text,kind,empty)&&!(k==='敏感度'&&!empty&&missingInfo(map[k])));if(!use.length)return;
++  const row=el('div','status-row status-cols-'+use.length);if(labels[0]==='姓名'&&(labels.includes('性別')||labels.includes('玩家性別')))row.classList.add('hys-person-identity');if(labels[0]==='年齡'&&labels.includes('顏值'))row.classList.add('hys-person-age');
++  use.forEach(k=>{let v=map[k];if(missingInfo(v))v='';
++   const notApplicable=fixed&&!v&&isMale(map)&&['罩杯','三圍','陰道長度','宮頸至宮底總深度','陰道狀況','子宮狀況'].includes(k);
++   const value=fixed?(v||(notApplicable?'不適用':empty&&k==='姓名'?infoEmpty(kind):'尚無相關資料')):(v||(empty?infoEmpty(kind):'尚無相關資料'));
++   const blk=el('div','attribute-block',((k==='對玩家的認知'&&map['__認知標籤'])||k)+'：'+value);blk.dataset.field=k;row.append(blk);
++   if(kind==='enemy'&&k==='敵方意圖'&&v){const et=intentEst(text,v);if(et){const sm=el('small','muted');sm.style.cssText='display:block;white-space:pre-line;margin-top:0.3em';sm.textContent=et;blk.append(sm);}}
++  });target.append(row);if(pend)pend.n++;
++ });flush();
++}
++
+ function actorKind(){return active===0?'enemy':active===1?'team':active===3?'partner':'near';}
+ function actorRows(){return active===0?ENEMY_ROWS:active===1?TEAM_ROWS:active===3?PARTNER_ROWS:NEAR_ROWS;}
+ function isBlankSlot(t){t=String(t||'').trim();if(!t)return true;const name=field(t,'姓名');if(name&&!missingInfo(name)&&!/^無$/.test(name))return false;return blankSnap(t);}
+ function fixedSlots(text,keys){const taggedList=keys.map(k=>tagged(text,k));if(taggedList.some(t=>t&&!isBlankSlot(t)))return keys.map((k,i)=>{const t=taggedList[i]||'';const n=field(t,'姓名');return {name:(n&&!/^無|當前無/.test(n)?n:k),body:isBlankSlot(t)?'':t};});const entries=[...clean(text).split(/(?=姓名\s*[：:])/)].map(x=>x.trim()).filter(x=>/^姓名\s*[：:]/.test(x)&&!isBlankSlot(x));return keys.map((k,i)=>({name:entries[i]?(field(entries[i],'姓名')||k):k,body:entries[i]||''}));}
+ function personNameKey(name){const value=clean(name).normalize('NFKC').replace(/[【】\[\]\s]/g,'');return /^(?:無|未知|尚未登錄|未建立|當前無.*|目前無.*|尚無.*|尚未建立.*|—)$/.test(value)?'':value;}
+ function excludeTeammates(sections){const names=new Set(fixedSlots(sections[1]||'',['隊友一','隊友二']).concat(fixedSlots(sections[0]||'',['敵方一','敵方二','敵方三','敵方四','敵方五'])).map(x=>personNameKey(parseFields(x.body)['姓名']||'')).filter(Boolean));if(!names.size)return sections;const next=sections.slice(),keys=['對象一','對象二','對象三'],pages=fixedSlots(next[3]||'',keys);const duplicate=body=>names.has(personNameKey(parseFields(body)['姓名']||''));if(pages.some(x=>duplicate(x.body))){next[3]=pages.map((x,i)=>'['+keys[i]+']\n'+(duplicate(x.body)||!x.body?'當前無互動的人物':x.body)+'\n[/'+keys[i]+']').join('\n');}const chunks=clean(next[4]||'').split(/(?=姓名\s*[：:])/).map(x=>x.trim()).filter(x=>/^姓名\s*[：:]/.test(x));if(chunks.some(duplicate))next[4]=chunks.filter(x=>!duplicate(x)).join('\n')||'當前無其他人員';return next;}
+-function renderActors(text,keys,empty){const rows=actorRows(),kind=actorKind();const pages=fixedSlots(text||'',keys);const nav=el('nav','actor-tabs');nav.setAttribute('aria-label','分頁切換');const card=el('section','self-item-card');const title=el('h3');const body=el('div','self-green-fields self-status');card.append(helpHeadWrap(title,kind),body);let sel=0;function show(i){sel=i;const x=pages[i];title.textContent=x.name||keys[i]||empty;body.replaceChildren();paintRows(body,x.body||'',rows,kind);if(kind==='team'){const fash=el('div'),ab=el('div');paintFashion(fash,x.body||'');paintAbilities(ab,x.body||'');body.append(el('h3','','武器與服飾'),fash,el('h3','','異能'),ab);}else if(kind==='enemy'){const ab=el('div');if(tagged(x.body||'','異能'))paintAbilities(ab,x.body||'');else{const lg=field(x.body||'','異能');ab.append(el('div','attribute-block','異能：'+(missingInfo(lg)?'尚無相關資料':lg)));}body.append(el('h3','','異能'),ab);}[...nav.querySelectorAll('button')].forEach((b,j)=>b.setAttribute('aria-pressed',String(j===sel)));}pages.forEach((x,i)=>nav.append(button(x.name||keys[i],()=>show(i))));drawer.append(nav,card);show(0);}
++function renderActors(text,keys,empty){const rows=actorRows(),kind=actorKind();const pages=fixedSlots(text||'',keys);const nav=el('nav','actor-tabs');nav.setAttribute('aria-label','分頁切換');const card=el('section','self-item-card');const title=el('h3');const body=el('div','self-green-fields self-status');card.append(helpHeadWrap(title,kind),body);let sel=0;function show(i){sel=i;const x=pages[i];title.textContent=x.name||keys[i]||empty;body.replaceChildren();paintRows(body,x.body||'',rows,kind,keys[i]);if(kind==='team'){const fash=el('div'),ab=el('div');paintFashion(fash,x.body||'');paintAbilities(ab,x.body||'');body.append(el('h3','','武器與服飾'),fash,el('h3','','異能'),ab);}else if(kind==='enemy'){const ab=el('div');if(tagged(x.body||'','異能'))paintAbilities(ab,x.body||'');else{const lg=field(x.body||'','異能');ab.append(el('div','attribute-block','異能：'+(missingInfo(lg)?'尚無相關資料':lg)));}body.append(el('h3','','異能'),ab);}[...nav.querySelectorAll('button')].forEach((b,j)=>b.setAttribute('aria-pressed',String(j===sel)));}pages.forEach((x,i)=>nav.append(button(x.name||keys[i],()=>show(i))));drawer.append(nav,card);show(0);}
+ 
+ function trackControl(host,x,pages){
+  const nm=String(x.name||'').trim();if(!x.body||!field(x.body,'姓名'))return;
+@@ -1472,5 +1493,5 @@
+ function destroyPinnedPanels(){if(!pinState)return;releasePopups();pinState.host?.remove();clearPinFallback();pinState=null;}
+ 
+ 
+-W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-unified-validation',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
++W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-fixed-person-fields',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
+ })();
+
+瀏覽器測試結果
+{
+  "results": [
+    {
+      "name": "敵方資訊",
+      "phase": "空白資料",
+      "fields": 56,
+      "folds": 2
+    },
+    {
+      "name": "隊友資訊",
+      "phase": "空白資料",
+      "fields": 61,
+      "folds": 2
+    },
+    {
+      "name": "自身資訊",
+      "phase": "空白資料",
+      "fields": 59,
+      "folds": 2
+    },
+    {
+      "name": "當前互動人物",
+      "phase": "空白資料",
+      "fields": 45,
+      "folds": 2
+    },
+    {
+      "name": "敵方資訊",
+      "phase": "部分資料",
+      "fields": 56,
+      "folds": 2
+    },
+    {
+      "name": "隊友資訊",
+      "phase": "部分資料",
+      "fields": 61,
+      "folds": 2
+    },
+    {
+      "name": "自身資訊",
+      "phase": "部分資料",
+      "fields": 59,
+      "folds": 2
+    },
+    {
+      "name": "當前互動人物",
+      "phase": "部分資料",
+      "fields": 45,
+      "folds": 2
+    }
+  ],
+  "existingValues": "零值、無與全身 1.0 保留；未適用缺值顯示不適用",
+  "foldState": "空白人物槽、具名人物切換、資料更新及固定面板保留各自狀態",
+  "near": "維持原有欄位，沒有新增色色欄與淫紋欄",
+  "mobile": "四個人物面板保有折疊區塊，可互動人員維持原樣",
+  "errors": []
+}
