@@ -1,0 +1,268 @@
+玲瓏學院｜各資訊區塊獨立抓取
+
+修改內容
+所有資訊區塊的抓取不再以 [HYS資訊] 與 [/HYS資訊] 決定範圍。外層標籤缺少、提早結束或落在人物資料中間時，只要各自區塊的成對標籤完整，就能讀取。
+敵方一至敵方五，分別讀取 [敵方一]…[/敵方一] 至 [敵方五]…[/敵方五]。
+隊友一、隊友二，分別讀取各自的成對標籤。
+互動對象一至對象三，分別讀取 [對象一]…[/對象一] 至 [對象三]…[/對象三]。
+自身資訊、可互動人員、可前往區域、可互動建築、任務，也各自依自己的成對標籤讀取。
+人物的異能、武器與服飾、背包等子資料，仍保留在所屬人物區塊內，不從其他人物頁面搬取。
+
+同一則回覆的資料
+聊天頁先轉存各個完整區塊，再限定於同一則 AI 回覆組合面板資料，支援只提供各人物頁標籤、沒有敵方／隊友／互動人物群組外標籤的格式。
+本輪缺少的區塊顯示缺資料，不從前一輪補回人物。
+任務、數據驗證、擲骰計算與劇情統整的資料來源也對齊當前回覆，避免改成多個獨立區塊後指到不同訊息。
+閱讀頁直接解析原始回覆中的各區塊。切換舊輪次時顯示該輪資料；回到最新輪次後恢復當前回覆資料。
+閱讀正文只移除已識別的資訊區塊與外層標記，避免 [/HYS資訊] 錯位造成快照殘留在正文，或錯把後方正文整段刪除。
+每個區塊自己的開始與結束標籤仍須同名配對。某位人物缺少自己的結束標籤時，不猜測其範圍，其他完整人物仍可讀取。
+
+保留的設定
+第零輪開場白預先顯示欄位；第一輪起的色色欄、淫紋欄及其他欄位顯隱規則保留。展開與收合功能保留。
+可互動人員維持原有欄位，不補色色欄或淫紋欄。
+五份檔案中只有正規表示式有修改。世界書、角色設定、輸出格式、額外指示與基礎版本逐位元組相同，沒有修改模型輸出契約，也沒有重編 UID。
+人物分組去重、欄位名稱、面板配置、配色、背景網址與計算公式保持相同。
+
+比對結果
+以「玲瓏學院-第零輪預建欄位與遊戲顯隱恢復」為基礎。
+新增資訊外標籤清理及獨立輪數轉存；資訊快照正則改為抓取各完整區塊。
+同步內嵌引擎的區塊組合、當前回覆辨識及閱讀頁快照解析；保留既有載入方式與分段打包機制。
+人物欄位清單、顯隱判斷函式、欄位繪製函式及收合操作函式與基礎版本相同。
+其他既有正則與資源保持相同；閱讀頁只調整資訊解析及依外層結束標籤判斷訊息的部分。
+
+檢查與測試
+全部正規表示式可編譯，外層 JavaScript、解碼後引擎及閱讀頁語法檢查通過。引擎與閱讀頁重新解碼後，皆與修改來源一致。
+以 Chromium、模擬聊天頁面與 SDK，實際套用完整正則處理流程，測試正常外層、外層提早結束、結束標籤落在敵方一內、缺少開頭、缺少結尾、完全沒有外層，以及沒有敵方／隊友／互動群組外層等格式。
+各案例均核對敵方五頁、隊友兩頁、互動對象三頁、自身資料與背包、可互動人員、區域、建築及任務。
+另測試單一人物結束標籤缺少時其他頁仍可讀取、新輪缺資料不沿用舊人物、當前回覆的數據驗證及擲骰來源、閱讀頁歷史／最新輪切換與固定面板更新。
+顯隱回歸測試涵蓋第零輪預建、遊戲中的日常／親密／淫紋條件、條件消失、空白人物槽、性別、敏感度、特定技能、收合操作、固定面板與手機尺寸。
+瀏覽器測試沒有未處理 JavaScript 錯誤。未在使用者登入後的 Hearthroom 實際頁面測試。
+
+交付
+正規表示式.json 可單獨下載匯入。同名 ZIP 包含五份設定檔與修改說明。
+修改內容完整.txt 分開提供，不放入 ZIP。
+
+新增與調整的資訊轉存正則全文
+{
+  "id": 124,
+  "scriptName": "HYS資訊外標籤清理",
+  "findRegex": "/[\\[【]\\/?(?:HYS|hys)(?:資訊|资讯)[\\]】]|\\[\\/?(?:敵方資訊|隊友資訊|當前互動人物)\\]/g",
+  "replaceString": "",
+  "disabled": false
+}
+{
+  "id": 125,
+  "scriptName": "HYS輪數轉存",
+  "findRegex": "/(^|\\n)([ \\t]*(?:輪數|轮数)[ \\t]*[：:][ \\t]*\\d+[ \\t]*)(?=\\r?$)/gm",
+  "replaceString": "$1<span class=\"hys9-info-round\" hidden style=\"display:none!important\">$2</span>",
+  "disabled": false
+}
+{
+  "id": 105,
+  "scriptName": "HYS資訊快照",
+  "findRegex": "/\\[(敵方[一二三四五]|隊友[一二]|對象[一二三]|自身資訊|可互動人員|可前往區域|可互動建築)\\]((?:(?!\\[\\1\\])[\\s\\S])*?)\\[\\/\\1\\]/g",
+  "replaceString": "<span class=\"hys9-snapshot\" hidden style=\"display:none!important\">[$1]$2[/$1]</span>",
+  "disabled": false
+}
+
+內嵌引擎完整修改差異
+--- 基礎內嵌引擎
++++ 交付內嵌引擎
+@@ -6 +6 @@
+-if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-opening-person-visibility'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
++if(W[KEY]){if(W[KEY].rev==='hys-linglong-20261020-independent-info'){W[KEY].scan();return;}try{W[KEY].destroy();}catch(_e){}}
+@@ -24,0 +25,14 @@
++function infoBlock(text,tag){
++ const re=new RegExp('\\['+tag+'\\]((?:(?!\\['+tag+'\\])[\\s\\S])*?)\\[\\/'+tag+'\\]','g');let m,last=null;while((m=re.exec(String(text||''))))last=m[1].trim();return last;
++}
++function infoRound(text){
++ const s=String(text||''),m=/(?:^|\n)\s*(?:輪數|轮数)\s*[：:]\s*(\d+)/.exec(s)||/(?:回覆輪數|回复轮数)\s*[：:]\s*第\s*\[?\s*(\d+)\s*\]?\s*[輪轮]/.exec(s);return m?Number(m[1]):-1;
++}
++function infoSnapshot(text,n=-1){
++ const src=String(text||''),blocks=[],wrap=(tag,body)=>'['+tag+']\n'+body+'\n[/'+tag+']';
++ [['敵方資訊',['敵方一','敵方二','敵方三','敵方四','敵方五']],['隊友資訊',['隊友一','隊友二']],['當前互動人物',['對象一','對象二','對象三']]].forEach(([tag,keys])=>{
++  const pages=keys.map(key=>{const body=infoBlock(src,key);return body===null?null:wrap(key,body);}).filter(x=>x!==null);const body=pages.length?pages.join('\n'):infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));
++ });
++ ['自身資訊','可互動人員','可前往區域','可互動建築','任務'].forEach(tag=>{const body=infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));});
++ const detected=infoRound(src);if(detected>=0)n=detected;return (n>=0?'輪數：'+n+'\n':'')+blocks.join('\n');
++}
+@@ -305 +319 @@
+-function currentTaskRaw(){if(viewOverride)return tagged(viewOverride.snap,'任務');const frames=[...D.querySelectorAll('.hys9-frame')].filter(n=>!n.classList.contains('hys9-spent')&&(n.querySelector('.hys9-snapshot')||n.querySelector('.hys9-task-source')));const frame=frames[frames.length-1]||latestStoryFrame();if(!frame)return tagged(lastText,'任務')||tagged(state[2]||'','任務')||'';const snapshot=frame.querySelector('.hys9-snapshot');const text=snapshot?clean(snapshot.textContent):'';if(/\[任務\]/.test(text))return tagged(text,'任務');const sources=[...frame.querySelectorAll('.hys9-task-source')].filter(n=>!n.closest('.hys9-snapshot'));return sources.map(n=>tagged(n.textContent,'任務')).filter(Boolean).join('\n\n');}
++function currentTaskRaw(){if(viewOverride)return tagged(infoSnapshot(clean(viewOverride.snap)),'任務');const frame=latestInfoFrame()||latestStoryFrame();return tagged(frame?frameInfo(frame):lastText,'任務');}
+@@ -311,2 +325 @@
+- const snapshots=[...D.querySelectorAll('.hys9-snapshot')],snapshot=snapshots[snapshots.length-1];
+- const frame=latestStoryFrame();const scope=(snapshot&&(snapshot.closest('.item.Ai')||snapshot.closest('.content.left')))||(frame&&(frame.closest('.item.Ai')||frame.closest('.content.left')))||frame||D;
++ const frame=latestInfoFrame()||latestStoryFrame();const scope=frame;if(!scope)return [];
+@@ -314 +327 @@
+- if(cls==='hys9-validation-source'){const raw=snapshot?clean(snapshot.textContent):lastText;const block=tagged(raw,'數據驗證')||tagged(raw,'数据验证');if(block)list.push(block);if(!list.length){const matches=raw.match(/〖(?:數據驗證|数据验证)[^〖〗]*〗/g);if(matches)list.push(matches.join('\n'));}}
++ if(cls==='hys9-validation-source'){const raw=[...scope.querySelectorAll('.hys9-snapshot')].map(n=>clean(n.textContent)).join('\n')||lastText;const block=tagged(raw,'數據驗證')||tagged(raw,'数据验证');if(block)list.push(block);if(!list.length){const matches=raw.match(/〖(?:數據驗證|数据验证)[^〖〗]*〗/g);if(matches)list.push(matches.join('\n'));}}
+@@ -1401,0 +1415,7 @@
++function infoScope(node){return node&&(node.closest('.hys9-frame')||node.closest('[data-chat="message"],.item.Ai,.content.left')||node.parentElement);}
++function frameInfo(scope){
++ if(!scope)return '';const selector='.hys9-snapshot,.hys9-info-round,.hys9-task-source';const nodes=[...scope.querySelectorAll(selector)].filter(node=>!node.parentElement?.closest(selector));const raw=nodes.map(node=>clean(node.textContent)).join('\n');return infoSnapshot(raw,infoRound(clean(scope.textContent)));
++}
++function latestInfoFrame(){
++ const nodes=[...D.querySelectorAll('.hys9-frame,.hys9-snapshot,.hys9-info-round,.hys9-task-source')].filter(node=>!node.closest('.hys9-spent,[data-from="user"],.item.self,.content.right')&&(!node.classList.contains('hys9-frame')||infoRound(clean(node.textContent))>=0));return infoScope(nodes[nodes.length-1]);
++}
+@@ -1403 +1423 @@
+-function scan(){if(!dockHost.isConnected)D.body.append(dockHost);syncPageLayout();markNativeModels();const snaps=[...D.querySelectorAll('.hys9-snapshot')];const latest=snaps[snaps.length-1];const srcText=viewOverride?viewOverride.snap:(latest?latest.textContent:null);if(srcText!==null){const t=clean(srcText),r=round(t);if(t!==lastText){lastText=t;lastRound=r;state=excludeTeammates(sectionTags.map(tag=>tagged(t,tag)||'本輪未提供'));if(active>=0)renderPanel();refreshPinnedPanels();}}D.querySelectorAll('.hys9-opening').forEach((n,i)=>{if(i===0){const frame=n.closest('.hys9-frame');if(frame&&n.parentElement===frame)frame.after(n);mountRegistry(n);}else n.hidden=true;});scanActions();if(typeof tagSceneMeta==='function')tagSceneMeta();if(typeof applyType==='function')applyType();const taskSignature=currentTaskRaw();if(taskSignature!==lastTaskSignature){lastTaskSignature=taskSignature;if(active===6)renderPanel();if(pinState&&pinState.records.some(r=>r.index===6))refreshPinnedPanels();}syncStoryPanels();}
++function scan(){if(!dockHost.isConnected)D.body.append(dockHost);syncPageLayout();markNativeModels();const frame=latestInfoFrame();const srcText=viewOverride?infoSnapshot(clean(viewOverride.snap)):(frame?frameInfo(frame):null);if(srcText!==null){const t=clean(srcText),r=round(t);if(t!==lastText){lastText=t;lastRound=r;state=excludeTeammates(sectionTags.map(tag=>tagged(t,tag)||'本輪未提供'));if(active>=0)renderPanel();refreshPinnedPanels();}}D.querySelectorAll('.hys9-opening').forEach((n,i)=>{if(i===0){const frame=n.closest('.hys9-frame');if(frame&&n.parentElement===frame)frame.after(n);mountRegistry(n);}else n.hidden=true;});scanActions();if(typeof tagSceneMeta==='function')tagSceneMeta();if(typeof applyType==='function')applyType();const taskSignature=currentTaskRaw();if(taskSignature!==lastTaskSignature){lastTaskSignature=taskSignature;if(active===6)renderPanel();if(pinState&&pinState.records.some(r=>r.index===6))refreshPinnedPanels();}syncStoryPanels();}
+@@ -1411 +1431 @@
+- const scope=(snapshot&&(snapshot.closest('.item.Ai')||snapshot.closest('.content.left')))||(frame&&(frame.closest('.item.Ai')||frame.closest('.content.left')))||frame;
++ const scope=latestInfoFrame()||frame;
+@@ -1496 +1516 @@
+-W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-opening-person-visibility',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
++W[KEY]={viewSnapshot:(snap,story,calcs,valids)=>{viewOverride=(typeof snap==='string'&&snap)?{snap:snap,story:String(story||''),calcs:Array.isArray(calcs)?calcs:[],valids:Array.isArray(valids)?valids:[]}:null;lastText='';lastStorySignature='';scan();},readerSkin:()=>({palette:{...simplePalette},size:uiFont,face:faceStack(),bold:uiBold,script:uiScript,bg:readerBg,background:{...currentBackground()},transparency:bubbleTransparency}),readerText:displayText,readerDraft:text=>fillAction(actionPayload(suggestBody(text))),scan,destroy,pending:0,rev:'hys-linglong-20261020-independent-info',modelTimer:setInterval(()=>{try{markNativeModels();}catch(_e){}},500)};observer.observe(D.body,{childList:true,subtree:true,characterData:true});renderDock();scan();
+
+閱讀頁完整修改差異
+--- 基礎閱讀頁
++++ 交付閱讀頁
+@@ -3 +3 @@
+-const W=window,D=document,KEY='__jianghuSceneReader',REV='hys-reader-validation-wrapper-20261020';
++const W=window,D=document,KEY='__jianghuSceneReader',REV='hys-reader-independent-info-20261020';
+@@ -58,0 +59,17 @@
++function infoBlock(text,tag){
++ const re=new RegExp('\\['+tag+'\\]((?:(?!\\['+tag+'\\])[\\s\\S])*?)\\[\\/'+tag+'\\]','g');let m,last=null;while((m=re.exec(String(text||''))))last=m[1].trim();return last;
++}
++function infoRound(text){
++ const s=String(text||''),m=/(?:^|\n)\s*(?:輪數|轮数)\s*[：:]\s*(\d+)/.exec(s)||/(?:回覆輪數|回复轮数)\s*[：:]\s*第\s*\[?\s*(\d+)\s*\]?\s*[輪轮]/.exec(s);return m?Number(m[1]):-1;
++}
++function infoSnapshot(text,n=-1){
++ const src=String(text||''),blocks=[],wrap=(tag,body)=>'['+tag+']\n'+body+'\n[/'+tag+']';
++ [['敵方資訊',['敵方一','敵方二','敵方三','敵方四','敵方五']],['隊友資訊',['隊友一','隊友二']],['當前互動人物',['對象一','對象二','對象三']]].forEach(([tag,keys])=>{
++  const pages=keys.map(key=>{const body=infoBlock(src,key);return body===null?null:wrap(key,body);}).filter(x=>x!==null);const body=pages.length?pages.join('\n'):infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));
++ });
++ ['自身資訊','可互動人員','可前往區域','可互動建築','任務'].forEach(tag=>{const body=infoBlock(src,tag);if(body!==null)blocks.push(wrap(tag,body));});
++ const detected=infoRound(src);if(detected>=0)n=detected;return (n>=0?'輪數：'+n+'\n':'')+blocks.join('\n');
++}
++function stripInfo(text){
++ return String(text||'').replace(/\[(敵方[一二三四五]|隊友[一二]|對象[一二三]|自身資訊|可互動人員|可前往區域|可互動建築|任務)\]((?:(?!\[\1\])[\s\S])*?)\[\/\1\]/g,'').replace(/\[(敵方資訊|隊友資訊|當前互動人物)\][\s\S]*?\[\/\1\]/g,'').replace(/[\[【]\/?HYS(?:資訊|资讯)[\]】]|\[\/?(?:敵方資訊|隊友資訊|當前互動人物)\]/gi,'').replace(/^[ \t]*(?:輪數|轮数)\s*[：:]\s*\d+[ \t]*$/gm,'');
++}
+@@ -63 +80 @@
+- let s=text.replace(/[\[【]HYS(?:已選技能|已选技能)[\]】][\s\S]*?(?:[\[【]\/HYS(?:已選技能|已选技能)[\]】]|$)/gi,'').replace(/[\[【]HYS(?:資訊|资讯)[\]】][\s\S]*?(?:[\[【]\/HYS(?:資訊|资讯)[\]】]|$)/gi,'').replace(/\[HYS(?:劇情統整|剧情统整)\][\s\S]*?(?:\[\/HYS(?:劇情統整|剧情统整)\]|$)/gi,'').replace(/\[(?:數據驗證|数据验证)\][\s\S]*?\[\/(?:數據驗證|数据验证)\]/g,'').replace(/〖[^〖〗]*〗/g,'').replace(/^\s*(?:---|\*\*\*|___|\[---\])\s*$/gm,'').trim();
++ let s=stripInfo(text).replace(/[\[【]HYS(?:已選技能|已选技能)[\]】][\s\S]*?(?:[\[【]\/HYS(?:已選技能|已选技能)[\]】]|$)/gi,'').replace(/\[HYS(?:劇情統整|剧情统整)\][\s\S]*?(?:\[\/HYS(?:劇情統整|剧情统整)\]|$)/gi,'').replace(/\[(?:數據驗證|数据验证)\][\s\S]*?\[\/(?:數據驗證|数据验证)\]/g,'').replace(/〖[^〖〗]*〗/g,'').replace(/^\s*(?:---|\*\*\*|___|\[---\])\s*$/gm,'').trim();
+@@ -76 +93 @@
+- const sm=/[\[【]HYS(?:資訊|资讯)[\]】]([\s\S]*?)[\[【]\/HYS(?:資訊|资讯)[\]】]/i.exec(text),gm=/\[HYS(?:劇情統整|剧情统整)\]([\s\S]*?)\[\/HYS(?:劇情統整|剧情统整)\]/i.exec(text);
++ const snap=infoSnapshot(text,n===null?-1:n),gm=/\[HYS(?:劇情統整|剧情统整)\]([\s\S]*?)\[\/HYS(?:劇情統整|剧情统整)\]/i.exec(text);
+@@ -78 +95 @@
+- return {round:n,guide,guideLabel,meta,body:body.replace(/【HYS登錄】|\{\{hys-setup-form\}\}/gi,'').trim(),choices,opening,snap:sm?sm[1]:'',story:gm?gm[1]:'',calcs,valids};
++ return {round:n,guide,guideLabel,meta,body:body.replace(/【HYS登錄】|\{\{hys-setup-form\}\}/gi,'').trim(),choices,opening,snap,story:gm?gm[1]:'',calcs,valids};
+@@ -124 +141 @@
+- if(outcome&&msg&&msg.role==='ai'&&roundOf(msg.content)!==null&&!/\[\/HYS(?:資訊|资讯)\]/i.test(msg.content||''))return;
++ if(outcome&&msg&&msg.role==='ai'&&roundOf(msg.content)!==null&&!infoSnapshot(plain(msg.content)))return;
+
+完整流程測試結果
+{
+  "rules": 125,
+  "results": [
+    "正常外層",
+    "外層提早結束",
+    "外層在敵方一內容中結束",
+    "缺少外層結束",
+    "缺少外層開頭",
+    "完全沒有外層",
+    "人物群組外層也省略",
+    "單一人物缺少結束標籤不影響其他人物",
+    "不同訊息不混用資料",
+    "新輪缺資料不沿用舊人物",
+    "閱讀頁歷史輪次獨立抓取，正文與六條建議保留",
+    "固定面板更新",
+    "第零輪預建與開始遊戲後顯隱保留"
+  ],
+  "scope": "敵方五頁、隊友兩頁、互動對象三頁、自身、可互動人員、區域、建築與任務",
+  "errors": []
+}
+
+顯隱回歸測試結果
+{
+  "rules": 125,
+  "results": [
+    {
+      "scenario": "尚無快照的開場白",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "第零輪空白資料",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "第零輪已有部分資料",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "第一輪非親密且無標記",
+      "panels": 4,
+      "groups": []
+    },
+    {
+      "scenario": "符合親密條件，無標記",
+      "panels": 4,
+      "groups": [
+        "色色欄"
+      ]
+    },
+    {
+      "scenario": "有標記，非親密",
+      "panels": 4,
+      "groups": [
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "同時符合兩組條件",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "條件結束後重新隱藏",
+      "panels": 4,
+      "groups": []
+    },
+    {
+      "scenario": "遊戲開始後空白人物槽",
+      "panels": 4,
+      "groups": []
+    },
+    {
+      "scenario": "男性及預設敏感度維持原規則",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "非預設敏感度及特定技能欄位",
+      "panels": 4,
+      "groups": [
+        "色色欄",
+        "淫紋欄"
+      ]
+    },
+    {
+      "scenario": "缺少輪數的實際資料不當成開場白",
+      "panels": 4,
+      "groups": []
+    }
+  ],
+  "pinned": "開場白固定面板進入遊戲後重新套用顯隱",
+  "reader": "第零輪預建，返回目前輪次後恢復動態顯隱",
+  "folds": "顯示時可展開與收合，同一人物更新保留狀態",
+  "near": "原有欄位與顯隱規則不變，沒有新增分組",
+  "mobile": "四個面板依條件顯隱，兩個收合區塊可操作",
+  "errors": []
+}
