@@ -1,0 +1,8 @@
+【新增正規表示式：HYS NPC查詢隱藏】
+尋找（findRegex）：/\[NPC查詢\]([\s\S]*?)\[\/NPC查詢\][ \t]*(?:\r?\n[ \t]*)*/g
+取代為：<span class="hys9-npc-query-source" hidden style="display:none!important">[NPC查詢]$1[/NPC查詢]</span>
+位置：HYS資料修正轉存 之後
+
+【修改：劇情閱讀頁清理函式 stripInfo】
+在原有清理最前面加上：.replace(/\[NPC查詢\][\s\S]*?\[\/NPC查詢\]/g,'')
+（寫在 HYS劇情閱讀頁／HYS閱讀頁高度段1 兩支打包腳本內，非人工編輯的內容，請直接使用 正規表示式.json。）
