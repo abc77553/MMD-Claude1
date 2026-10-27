@@ -1,0 +1,83 @@
+修改內容完整
+
+本次沒有修改世界書條目與三個文字檔，只在正規表示式.json 內嵌引擎的開場白登錄表單新增「快速填入」功能。
+
+新增的程式碼全文如下（位於 mountRegistry 之前，並在表單最上方加入快速填入面板）：
+
+const QF_ALIAS={'玩家性別':'性別','能值等級':'能值等階','力量':'先天力量','敏捷':'先天敏捷','體質':'先天體質','悟性':'先天悟性'};
+function qfNorm(s){return String(s||'').replace(/[\s　]/g,'').replace(/[（]/g,'(').replace(/[）]/g,')').replace(/[，]/g,',').toLowerCase();}
+function qfOpts(f){if(f.optionGroupsBySex){const g=f.optionGroupsBySex[values['性別']]||{};return [].concat(...Object.values(g));}return registryOptions(f)||[];}
+function qfField(prefix){return cfg.fields.find(f=>!f.section&&f.label.indexOf(prefix)===0);}
+function qfSet(f,raw,res){
+ let v=String(raw||'').trim();
+ if(v==='未填'||v==='未知'||(f.label==='自訂金手指'&&v==='無'))v='';
+ if(f.type==='number'){
+  if(v===''){values[f.label]='';return true;}
+  const n=parseFloat(v.replace(/[,，\s]/g,''));
+  if(!isFinite(n)){res.bad.push(f.label+'＝'+raw+'（不是數字）');return false;}
+  let r=Math.round(n);if(f.min!==undefined&&r<f.min)r=f.min;if(f.max!==undefined&&r>f.max)r=f.max;values[f.label]=String(r);return true;
+ }
+ if(f.type==='checkbox'){
+  const opts=f.options||[],picks=v.split(/[、,，]/).map(s=>s.trim()).filter(Boolean);
+  const ok=picks.filter(p=>opts.indexOf(p)>=0),no=picks.filter(p=>opts.indexOf(p)<0);
+  values[f.label]=ok.join('、');no.forEach(p=>res.bad.push(f.label+'＝'+p+'（選項已不存在）'));return true;
+ }
+ if(f.type==='radio'||f.options||f.optionsBySex||f.optionGroupsBySex||f.optionsByScore){
+  const opts=qfOpts(f);
+  if(v===''){if(f.blank||!opts.length){values[f.label]='';return true;}return false;}
+  if(opts.indexOf(v)>=0){values[f.label]=v;return true;}
+  const hit=opts.find(o=>qfNorm(o)===qfNorm(v));
+  if(hit){values[f.label]=hit;return true;}
+  res.bad.push(f.label+'＝'+raw+'（選項已不存在，保留預設）');return false;
+ }
+ values[f.label]=v;return true;
+}
+function qfApply(text){
+ const res={filled:0,renamed:[],unknown:[],bad:[],fresh:[]};
+ const byNorm={};cfg.fields.filter(f=>!f.section).forEach(f=>{byNorm[qfNorm(f.label)]=f;});
+ const jobs=[];
+ String(text||'').split(/\r?\n/).forEach(line=>{
+  const t=line.trim();if(!t||/^開局[：:]\s*角色資料確認/.test(t))return;
+  const m=/^([^：:]{1,40})[：:]\s*([\s\S]*)$/.exec(t);if(!m)return;
+  const lab=m[1].trim(),val=m[2].trim();
+  if(lab==='性特徵'){
+   const num=(re)=>{const x=re.exec(val);return x?x[1]:null;};
+   const parts=[['肉棒長度',num(/肉棒長\s*([0-9.]+)\s*公分/)],['肉棒粗度',num(/粗\s*([0-9.]+)\s*公分/)],['罩杯',num(/([A-Ja-j])\s*罩杯/)],['小穴外觀',num(/小穴外觀[：:]\s*(.*)$/)]];
+   parts.forEach(([p,x])=>{const f=qfField(p);if(f&&x!==null)jobs.push({f,val:p==='罩杯'?x.toUpperCase():x,lab:'性特徵'});});
+   res.renamed.push('「性特徵」拆回肉棒長度、肉棒粗度、罩杯、小穴外觀');return;
+  }
+  let f=byNorm[qfNorm(lab)],how='';
+  if(!f&&QF_ALIAS[lab]){f=byNorm[qfNorm(QF_ALIAS[lab])];if(f)how='「'+lab+'」→「'+f.label+'」';}
+  if(!f){
+   const n=qfNorm(lab.replace(/[（(].*$/,'')),c=Object.keys(byNorm).filter(k=>n.length>=2&&(k.indexOf(n)===0||n.indexOf(k)===0));
+   if(c.length===1){f=byNorm[c[0]];how='「'+lab+'」→「'+f.label+'」（近似比對，請確認）';}
+  }
+  if(!f){if(lab.length<=24)res.unknown.push(lab);return;}
+  if(how)res.renamed.push(how);
+  jobs.push({f,val,lab});
+ });
+ const rank=j=>j.f.label==='性別'?0:j.f.label==='顏值'?1:2;
+ jobs.sort((a,b)=>rank(a)-rank(b));
+ const hit=new Set();
+ jobs.forEach(j=>{if(qfSet(j.f,j.val,res)){res.filled++;}hit.add(j.f.label);if(j.f.label==='性別')registryGender=values['性別'];});
+ syncRegistryValues();
+ cfg.fields.filter(f=>!f.section&&!hit.has(f.label)&&allowed(f)).forEach(f=>res.fresh.push(f.label));
+ return res;
+}
+function quickFillPanel(redraw){
+ const wrap=el('details','hys-quickfill');wrap.style.cssText='margin:10px 0;padding:8px 12px;border:1px solid var(--hys-border,#999);border-radius:8px';
+ const sm=el('summary','','快速填入（貼上舊的登錄資料）');sm.style.cursor='pointer';
+ const tip=el('p','muted','把你存起來的舊「開局：角色資料確認」文字整段貼進來，按「辨識並填入」，會依欄位名稱填進這張新表單；欄位改名會自動對應，選項已不存在或新增的欄位會列在下方提示。');
+ const ta=el('textarea');ta.rows=8;ta.placeholder='貼上舊的登錄資料…';ta.style.cssText='width:100%;box-sizing:border-box';
+ const out=el('div','notice');out.style.cssText='white-space:pre-wrap;margin:8px 0 0';
+ const run=button('辨識並填入',()=>{
+  if(!ta.value.trim()){out.textContent='請先貼上舊的登錄資料。';return;}
+  const r=qfApply(ta.value),L=['已填入 '+r.filled+' 項。'];
+  if(r.renamed.length)L.push('欄位對應：'+r.renamed.join('；'));
+  if(r.bad.length)L.push('略過（請自行重選）：'+r.bad.join('；'));
+  if(r.unknown.length)L.push('新表單已沒有這些欄位（未使用）：'+r.unknown.join('、'));
+  if(r.fresh.length)L.push('新表單有、舊資料沒有，請自行確認：'+r.fresh.join('、'));
+  out.textContent=L.join('\n');redraw();
+ },'primary');
+ wrap.append(sm,tip,ta,run,out);return wrap;
+}
