@@ -1,0 +1,31 @@
+修改內容完整
+
+本次只修改正規表示式.json 內的閱讀頁程式（腳本「HYS劇情閱讀頁」與「HYS閱讀頁高度段1」，兩者合起來是一份以 base64 編碼、再拆成兩半存放的程式，修改後重新拆成兩半）。其餘腳本（含你自己改的閱讀樣式與背景設定）、世界書、三個文字檔、人物建立規範完全沒動。
+
+一、判斷最後幾行操作句的部分（讓閱讀頁認得五行開局選項）
+原本：
+  choices.unshift(a);tail=i;
+  …
+  if(choices.length===6)s=lines.slice(0,tail)…
+修改後：
+  choices.unshift(a);tail=i;if(/我確認招式，開局選開學前一天晚上/.test(a))break;
+  …
+  if(choices.length===6||(choices.length===5&&choices.some(c=>/我確認招式/.test(c))&&/我要調整招式/.test(choices[4])))s=lines.slice(0,tail)…
+
+二、顯示操作句的部分（讓刷新與自定義開局顯示成欄位）
+修改後：
+entry.choices.forEach(text=>{
+  const am=/^\[(?:日常|戰鬥|战斗|性愛|性爱)\]\s*(我要求刷新(?:本步驟|招式介紹))\s*$/.exec(text),om=/^\[(?:日常|戰鬥|战斗|性愛|性爱)\]\s*我確認招式，自定義開局\s*$/.test(text);
+  if(am||om){
+   const base=am?am[1]:'我確認招式，自定義開局',row=node('div','custom'),lab=node('span','',base+'：'),inp=node('input');
+   row.style.gridColumn='1 / -1';lab.style.cssText='flex:0 0 auto;font-weight:600';
+   inp.type='text';inp.placeholder=t(om?'輸入自定義開局內容（區域、地點、情境，可含日期與鐘點）':'刷新方向（可留空，留空則直接刷新）');inp.style.cssText='flex:1 1 220px;min-width:0';
+   const go=button('填入對話框',()=>{const v=inp.value.trim();if(om&&!v){setText(notice,'請先輸入自定義開局內容。');return;}draft('[日常：'+base+(v?'：'+v:'')+']',notice);});
+   inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();go.click();}});
+   inp.disabled=!isLatest;go.disabled=!isLatest;row.append(lab,inp,go);grid.append(row);return;
+  }
+  const b=button(text,()=>draft(text,notice));b.disabled=!isLatest;grid.append(b);
+ });
+
+三、版本標記
+閱讀頁版本標記（REV）尾端加上「-choice-fields」，讓酒館載入時以新版取代舊版。
