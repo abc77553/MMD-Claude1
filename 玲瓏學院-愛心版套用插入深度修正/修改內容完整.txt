@@ -1,0 +1,17 @@
+玲瓏學院｜修改內容完整
+============================================================
+本次以「玲瓏學院｜按鈕粉色愛心」版為基準（你上傳的壓縮檔），把「插入深度讀不到肉棒長度」的修正套上去。世界書、角色設定、輸出格式、額外指示沒有修改（與你上傳的逐位元組相同），「HYS按鈕愛心」腳本也沒有動。修改的只有正規表示式.json 內嵌引擎（HYS引擎0 到 HYS引擎16 共 17 段）裡的兩個函式與版本字串。實際有變動的只有三段：HYS引擎0（版本字串）、HYS引擎8（兩個函式）、HYS引擎16（版本字串）；其餘 14 段與愛心版逐位元組相同。
+============================================================
+一、被改動的函式（引擎裡的原文與新文）
+============================================================
+【原本】
+function numOf(text,key){const m=String(field(text,key)||'').match(/\d+(?:\.\d+)?/);return m?Number(m[0]):null;}
+function userPenis(){const src=state[2]||'';return numOf(src,'肉棒長')||numOf(src,'長度');}
+
+【現在】
+function numOf(text,key){const m=String(field(text,key)||'').match(/\d+(?:\.\d+)?/);if(m)return Number(m[0]);const t=clean(text),x=new RegExp('(?:^|[\\n／｜|：:])\\s*'+key+'\\s*[：:]\\s*(\\d+(?:\\.\\d+)?)').exec(t);return x?Number(x[1]):null;}
+function userPenis(){const src=state[2]||'',feat=field(src,'性特徵');return numOf(src,'肉棒長')||numOf(feat,'長度')||numOf(src,'長度');}
+============================================================
+二、版本字串
+============================================================
+引擎版本字串（出現兩處）結尾由「…people2-bodysize1-venergy1」改成「…people2-bodysize1-venergy1-feature-line-length-v1」。版本字串換新，已載入舊引擎的頁面才會重新載入。
