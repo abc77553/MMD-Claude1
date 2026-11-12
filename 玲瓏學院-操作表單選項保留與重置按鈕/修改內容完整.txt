@@ -1,0 +1,31 @@
+玲瓏學院｜修改內容完整
+============================================================
+本次以「玲瓏學院-愛心版套用插入深度修正」為基準，參考你上傳的「色色模擬器-操作表單選項保留」。世界書、角色設定、輸出格式、額外指示沒有修改（與基準逐位元組相同）。修改的是正規表示式.json 內嵌引擎（HYS引擎0 到 HYS引擎16 共 17 段）：實際有變動的是 HYS引擎0 與 HYS引擎16（版本字串）、HYS引擎7 與 HYS引擎8（操作表單程式）；其餘 13 段與基準逐位元組相同，切分位置沒有改。
+程式取自色色模擬器的同一套寫法；玲瓏學院與色色模擬器的操作表單程式，除了色色模擬器自己的內容（色慾事件、世界觀綑綁道具等）外逐行相同，我逐行比對過，只搬了保存選項的部分，沒有搬色色模擬器專屬的內容。
+============================================================
+一、保存與讀取選項（引擎裡的新函式與變數，全文）
+============================================================
+/*hys-e9*/function readOpsSaved(host){const data={};if(!host)return data;host.querySelectorAll('select,textarea,input').forEach(n=>{const lab=n.closest('label');const k=(lab&&lab.querySelector('span')&&lab.querySelector('span').textContent)||n.getAttribute('aria-label')||'';if(k)data[k]=(n.tagName==='SELECT'&&n.value===''&&n.dataset.pendingSaved!==undefined)?n.dataset.pendingSaved:n.value;});return data;}
+
+function applySaved(node,v){if(node&&v!=null&&v!==''){if(node.tagName==='SELECT'&&![...node.options].some(o=>o.value===v)){if(!node.dataset.pendingWatch){node.dataset.pendingWatch='1';node.addEventListener('change',()=>{delete node.dataset.pendingSaved;});}node.dataset.pendingSaved=v;return;}delete node.dataset.pendingSaved;node.value=v;}}
+
+let opsTab='日常',opsSaved={日常:null,戰鬥:null,性愛:null};
+const OPS_STORE='hys-ops-saved-v1';
+try{const v=JSON.parse(W.localStorage.getItem(OPS_STORE)||'null');if(v&&typeof v==='object'){if(v.saved&&typeof v.saved==='object')for(const [k,x]of Object.entries(v.saved))if(x&&typeof x==='object'&&!Array.isArray(x))opsSaved[k]=x;if(typeof v.tab==='string')opsTab=v.tab;}}catch(e){}
+function storeOps(){try{W.localStorage.setItem(OPS_STORE,JSON.stringify({tab:opsTab,saved:opsSaved}));}catch(e){}}
+說明：選項改存在瀏覽器（localStorage，鍵名 hys-ops-saved-v1），重新整理頁面也保留；清單暫時沒有原本存的值時，欄位顯示空白但原值保留，之後回到清單就自動選回；玩家在該欄改選別的值才換掉。
+============================================================
+二、操作表單繪製（renderOps 與 draw 的開頭，全文）
+============================================================
+function renderOps(){const box=el('section','combat-form'),tabs=el('nav','actor-tabs');const keep=()=>{opsSaved[opsTab]=Object.assign({},opsSaved[opsTab]||{},readOpsSaved(box));storeOps();};box.addEventListener('input',keep);box.addEventListener('change',keep);const resetOps=()=>{opsSaved[opsTab]=null;box.replaceChildren();draw();storeOps();};drawer.append(tabs,box);
+
+function draw(){const prev=box.dataset.opsTab===opsTab?readOpsSaved(box):{};opsSaved[opsTab]=Object.assign({},opsSaved[opsTab]||{},prev);const opsHead=el('div','ops-head');opsHead.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap';opsHead.append(el('h3','',/操作$/.test(opsTab)?opsTab:opsTab+'操作'),button('重置本頁選項',resetOps));box.replaceChildren(opsHead);box.dataset.opsTab=opsTab;const saved=opsSaved[opsTab]||{};
+說明：欄位一有輸入或改選就立即存起來；重畫時只把屬於「目前這一頁」的值存回這一頁（淫紋與天之根兩頁同名欄位不再互相蓋掉）；表單上方多「重置本頁選項」按鈕，按下清空本頁全部欄位並同步清掉保存值。
+============================================================
+三、分頁按鈕
+============================================================
+分頁按鈕的點擊動作結尾加上 storeOps();（切換分頁時也存到瀏覽器）。
+============================================================
+四、版本字串
+============================================================
+引擎版本字串（出現兩處）結尾加上「-ops-keep-v1」。
