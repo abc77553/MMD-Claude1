@@ -1,0 +1,18 @@
+玲瓏學院｜修改內容完整
+============================================================
+本次以「玲瓏學院-操作表單選項保留與重置按鈕」為基準。世界書、角色設定、輸出格式、額外指示沒有修改（與基準逐位元組相同）。修改的是正規表示式.json 內嵌引擎（HYS引擎0 到 HYS引擎16 共 17 段）：實際有變動的是 HYS引擎0、HYS引擎9、HYS引擎16 三段；其餘 14 段與基準逐位元組相同，切分位置沒有改。
+============================================================
+一、新增函式（引擎裡，全文）
+============================================================
+\nfunction watchLang(r){if(!r)return;const set=W.__hysLangWatch||(W.__hysLangWatch=new WeakSet());if(set.has(r))return;set.add(r);let queued=false;const run=()=>{queued=false;try{paintLang(r);}catch(_e){}};new MutationObserver(()=>{if(queued)return;queued=true;if(typeof W.requestAnimationFrame==='function')W.requestAnimationFrame(run);else setTimeout(run,16);}).observe(r,{childList:true,subtree:true,characterData:true});}"
+說明：對指定的「影子根節點」（右側面板、固定面板、登錄表單各有一個）裝一個內容變動監看，只要裡面有文字被新增或改動，就在下一個畫面更新時呼叫原本的 paintLang 重新依「繁體／簡體」轉換一次。paintLang 本身沒有改，轉完沒有差異就不再寫入，所以不會無限循環。
+============================================================
+二、被改動的兩處
+============================================================
+・shadow 函式（建立影子根節點的地方）結尾，回傳前加上 watchLang(r);
+・固定面板建立影子根節點的地方，緊接著加上 watchLang(p.root);
+・paintLang 函式後面接上 watchLang 的定義。
+============================================================
+三、版本字串
+============================================================
+引擎版本字串（出現兩處）結尾加上「-lang-watch-v1」。
